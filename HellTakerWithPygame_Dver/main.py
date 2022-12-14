@@ -70,8 +70,8 @@ class Object:
         self.menu = 2
         self.event_pos = []
         self.event_lose = False
-        self.event_spawn = 250
-        self.event_speed = 0.2
+        self.event_spawn = 400
+        self.event_speed = 0.1
         self.event_player_pos = (650, 350)
         self.event_time = 0
         self.event_time_now = 0
@@ -183,10 +183,10 @@ class Board:
                         pos[1] += self.obj.event_speed
                     if(math.dist((pos[0]+15, pos[1]+10), (self.obj.event_player_pos[0]+25,self.obj.event_player_pos[1]+25)) < 25):
                         self.obj.event_lose = True
-            if((pygame.time.get_ticks() % 3000) == 0):
-                if(self.obj.event_spawn > 10):
-                    self.obj.event_spawn -= 40
-                self.obj.event_speed += 0.07
+            if((pygame.time.get_ticks() % 7000) == 0):
+                if(self.obj.event_spawn > 20):
+                    self.obj.event_spawn -= 20
+                self.obj.event_speed += 0.04
             if((pygame.time.get_ticks() - self.obj.event_time) % 1000 == 0):
                 self.obj.event_time_now += 1
         
