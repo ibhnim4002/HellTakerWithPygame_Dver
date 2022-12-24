@@ -6,6 +6,8 @@ pygame.init()
 
 class Settings:
     def __init__(self):
+        self.timer = pygame.time.Clock()
+        self.fps = 60
         self.width = 1300
         self.height = 700
         """self.obj_size = int(self.height / 14)
@@ -15,6 +17,11 @@ class Settings:
         self.background = pygame.transform.scale(self.background, (self.width, self.height))
         self.player = pygame.image.load('assets/objects/player.png')
         self.player = pygame.transform.scale(self.player, (50, 50))
+        self.player_2 = pygame.image.load('assets/objects/Player1.png')
+        self.player_2 = pygame.transform.scale(self.player_2, (50, 50))
+        #self.player_rect = self.player.get_rect()
+        self.player_ani = [self.player, self.player_2]
+        self.player_index = 0
         self.stone = pygame.image.load('assets/objects/stone.png')
         self.stone = pygame.transform.scale(self.stone, (50, 50))
         self.wall = pygame.image.load('assets/objects/wall.png')
@@ -70,11 +77,12 @@ class Object:
         self.menu = 2
         self.event_pos = []
         self.event_lose = False
-        self.event_spawn = 400
-        self.event_speed = 0.1
+        self.event_spawn = 300
+        self.event_speed = 0.3
         self.event_player_pos = (650, 350)
         self.event_time = 0
         self.event_time_now = 0
+        self.player_ani = True
         #self.reso = 3
         if(self.level == 9):
             self.level = 0
@@ -164,26 +172,30 @@ class Board:
             if(pygame.mouse.get_pos()[0] in range(0, 1250) and pygame.mouse.get_pos()[1] in range (0, 650)):
                 self.obj.event_player_pos = pygame.mouse.get_pos()
             self.screen.blit(self.sett.player, self.obj.event_player_pos)
+            self.event_spawn = pygame.USEREVENT + 1
+            pygame.time.set_timer(self.event_spawn, self.obj.event_spawn)
             if(self.obj.event_lose):
                 self.screen.blit(self.sett.ingame.render("Tết này bạn đã nghèo", False, (255, 255, 255)), (0.3 * 50, 5.5 * 50))
             else:
-                if((pygame.time.get_ticks() % self.obj.event_spawn) == 0):
+                if(self.event_spawn):
                     self.spawn = [random.randint(10, 1290), random.randint(10, 690)]
-                    if(math.dist((self.spawn[0]+15, self.spawn[1]+10), (self.obj.event_player_pos[0]+25,self.obj.event_player_pos[1]+25)) > 200): 
-                        self.obj.event_pos.append(self.spawn)
+                    self.spawn_rect = self.spawn.get_rect()
+                    self.obj.event_player_pos_rect = self.obj.event_player_pos.get_rect()
+                    if(math.dist(self.spawn_rect.center, self.obj.event_player_pos_rect.center) > 200): 
+                        self.obj.event_pos.append((self.sett.main_menu_2.render("nghèo", False, (255, 255, 255)), (0, 0)).get_rect(topleft = self.spawn))
                 for pos in self.obj.event_pos:
-                    self.screen.blit(self.sett.main_menu_2.render("nghèo", False, (255, 255, 255)), (pos[0], pos[1]))
-                    if(pos[0] > self.obj.event_player_pos[0]):
-                        pos[0] -= (self.obj.event_speed*1.1)
-                    elif(pos[0] < self.obj.event_player_pos[0]):
-                        pos[0] += (self.obj.event_speed*1.1)
-                    if(pos[1] > self.obj.event_player_pos[1]):
-                        pos[1] -= self.obj.event_speed
-                    elif(pos[1] < self.obj.event_player_pos[1]):
-                        pos[1] += self.obj.event_speed
+                    self.screen.blit(self.sett.main_menu_2.render("nghèo", False, (255, 255, 255)), pos)
+                    if(pos.x > self.obj.event_player_pos[0]):
+                        pos.x -= (self.obj.event_speed*1.1)
+                    elif(pos.x < self.obj.event_player_pos[0]):
+                        pos.x += (self.obj.event_speed*1.1)
+                    if(pos.y > self.obj.event_player_pos[1]):
+                        pos.y -= self.obj.event_speed
+                    elif(pos.y < self.obj.event_player_pos[1]):
+                        pos.y += self.obj.event_speed
                     if(math.dist((pos[0]+15, pos[1]+10), (self.obj.event_player_pos[0]+25,self.obj.event_player_pos[1]+25)) < 25):
                         self.obj.event_lose = True
-            if((pygame.time.get_ticks() % 7000) == 0):
+            if((pygame.time.get_ticks() % 5500) == 0):
                 if(self.obj.event_spawn > 20):
                     self.obj.event_spawn -= 20
                 self.obj.event_speed += 0.04
@@ -225,7 +237,15 @@ class Board:
             self.screen.blit(self.sett.ske, ((pos[1] + self.obj.col_count) * 50, (pos[0] + self.obj.row_count) * 50))
         for pos in self.obj.lock_pos:
             self.screen.blit(self.sett.lock, ((pos[1] + self.obj.col_count) * 50, (pos[0] + self.obj.row_count) * 50))
-        self.screen.blit(self.sett.player, ((self.obj.player_pos[1] + self.obj.col_count) * 50, (self.obj.player_pos[0] + self.obj.row_count) * 50))
+        self.screen.blit(self.sett.player_ani[int(self.sett.player_index)], ((self.obj.player_pos[1] + self.obj.col_count) * 50, (self.obj.player_pos[0] + self.obj.row_count) * 50))
+        if(self.obj.player_ani):
+            self.sett.player_index += 0.05
+            if(self.sett.player_index >= 1.9):
+                self.obj.player_ani = False
+        else:
+            self.sett.player_index -= 0.05
+            if(self.sett.player_index <= 0):
+                self.obj.player_ani = True
         
     def move(self, dir):
         next_move = [self.obj.player_pos[0] + dir[1], self.obj.player_pos[1] + dir[0]]
@@ -325,7 +345,7 @@ class Board:
         elif(not touch_wall):
             if(self.obj.level == 0):
                 if((self.obj.menu == 2) and (dir[1] != 0)):
-                    if(self.obj.choose + dir[1] in range(1, 6)):
+                    if((self.obj.choose + dir[1]) in range(1, 6)):
                         self.obj.player_pos = next_move
                         self.obj.choose += dir[1]
                 """elif(self.obj.menu == 3):
@@ -340,75 +360,15 @@ class Board:
                             self.obj.reso += dir[0]"""   
             else:
                 self.act(1, dir)
-                
-    """def move(self, dir):
-        counts = -1
-        for pos in self.obj.ske_pos:
-            counts += 1
-            if(((pos in self.obj.holea_pos) and (self.obj.popup == True)) or ((pos in self.obj.holeb_pos) and (self.obj.popup == False))):
-                del self.obj.ske_pos[counts]
-        next_move = [self.obj.player_pos[0] + dir[1], self.obj.player_pos[1] + dir[0]]
-        if(next_move in self.obj.goal_pos):
-            self.obj.player_pos = [self.obj.player_pos[0] + dir[1], self.obj.player_pos[1] + dir[0]]
-            self.obj.level += 1
-            self.obj.__init__()
-        elif(next_move in self.obj.lock_pos):
-            count = -1
-            for pos in self.obj.lock_pos:
-                count += 1
-                if(next_move == pos):
-                    if(self.obj.getkey):
-                        del self.obj.lock_pos[count]
-                        self.obj.getkey = False
-                        self.act(1, dir)
-        elif(next_move in self.obj.stone_pos):
-            count = -1
-            for pos in self.obj.stone_pos:
-                count += 1
-                if(next_move == pos):
-                    next_stone = [pos[0] + dir[1], pos[1] + dir[0]]
-                    if((next_stone not in self.obj.wall_pos) and (next_stone not in self.obj.goal_pos) and (next_stone not in self.obj.stone_pos) and (next_stone not in self.obj.ske_pos) and (next_stone not in self.obj.lock_pos)):
-                        self.obj.stone_pos[count] = [pos[0] + dir[1], pos[1] + dir[0]]
-                        #self.obj.player_pos = [self.obj.player_pos[0] + dir[1], self.obj.player_pos[1] + dir[0]]
-                    if((self.obj.player_pos in self.obj.spike_pos) or ((self.obj.player_pos in self.obj.holea_pos) and (self.obj.popup == True)) or ((self.obj.player_pos in self.obj.holeb_pos) and (self.obj.popup == False))):
-                        self.act(0, dir)   
-                    self.act(2, dir)
-        elif(next_move in self.obj.ske_pos):
-            count = -1
-            for pos in self.obj.ske_pos:
-                count += 1
-                if(next_move == pos):
-                    next_ske = [pos[0] + dir[1], pos[1] + dir[0]]
-                    if((next_ske not in self.obj.wall_pos) and (next_ske not in self.obj.stone_pos) and (next_ske not in self.obj.ske_pos) and (next_ske not in self.obj.spike_pos) and (next_ske not in self.obj.lock_pos) and (next_ske not in self.obj.goal_pos) and ((next_move not in self.obj.holea_pos) and (self.obj.popup == False)) and ((next_move in self.obj.holeb_pos) and (self.obj.popup == True))):
-                        self.obj.ske_pos[count] = [pos[0] + dir[1], pos[1] + dir[0]]
-                        #self.obj.player_pos = [self.obj.player_pos[0] + dir[1], self.obj.player_pos[1] + dir[0]]
-                        if((self.obj.player_pos in self.obj.spike_pos) or ((self.obj.player_pos in self.obj.holea_pos) and (self.obj.popup == False)) or ((self.obj.player_pos in self.obj.holeb_pos) and (self.obj.popup == True))):
-                            self.act(0, dir)
-                        self.act(2, dir)
-                    elif((next_ske in self.obj.wall_pos) or (next_ske in self.obj.goal_pos) or (next_ske in self.obj.ske_pos) or (next_ske in self.obj.stone_pos) or (next_ske in self.obj.spike_pos) or ((next_move in self.obj.holea_pos) and (self.obj.popup == True)) or ((next_move in self.obj.holeb_pos) and (self.obj.popup == False))):
-                        del self.obj.ske_pos[count]
-                        #self.obj.player_pos = [self.obj.player_pos[0] + dir[1], self.obj.player_pos[1] + dir[0]]
-                        self.act(2, dir)
-        elif(next_move in self.obj.spike_pos):
-            self.act(1, dir)
-            self.act(0, dir)
-        elif(((next_move in self.obj.holea_pos) and (self.obj.popup == True)) or ((next_move in self.obj.holeb_pos) and (self.obj.popup == False))):
-            self.act(1, dir)
-            self.act(0, dir)
-        elif(next_move in self.obj.key_pos):
-            count = -1
-            for pos in self.obj.key_pos:
-                count += 1
-                if(next_move == pos):
-                    del self.obj.key_pos[count]
-                    self.obj.getkey = True
-                    self.act(1, dir)
-        elif(next_move not in self.obj.wall_pos):
-            self.act(1, dir)"""
+            
 
     def act(self, possive, dir):
         if(possive == 1):
-            self.obj.player_pos = [self.obj.player_pos[0] + dir[1], self.obj.player_pos[1] + dir[0]]
+            for i in range (0, 10):                
+                self.obj.player_pos = [round(self.obj.player_pos[0] + dir[1]/10, 1), round(self.obj.player_pos[1] + dir[0]/10, 1)]
+                self.screen.blit(self.sett.player_ani[int(self.sett.player_index)], ((self.obj.player_pos[1] + self.obj.col_count) * 50, (self.obj.player_pos[0] + self.obj.row_count) * 50))
+                pygame.time.delay(100)
+                print(self.obj.player_pos)
             self.obj.moves -= 1
             self.obj.popup = not self.obj.popup
         elif(possive == 2):
@@ -419,6 +379,7 @@ class Board:
         
     def run(self):
         while True:
+            self.sett.timer.tick(self.sett.fps)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -458,8 +419,6 @@ class Board:
                             elif(self.obj.menu == 4):
                                 self.obj.__init__()
                                 pygame.mixer.music.stop()
-                                """self.obj.choose = 1
-                                self.obj.player_pos = [self.obj.player_pos[0] - 2, self.obj.player_pos[1]]"""
                     else:
                         if event.key in self.sett.KEY_DIR:
                             self.move(self.sett.KEY_DIR[event.key])
@@ -487,7 +446,6 @@ class Board:
             else:
                 self._draw_board()
             pygame.display.update()
-            #(pygame.time.Clock()).tick(300)
 
 
 myLevel = Board()
