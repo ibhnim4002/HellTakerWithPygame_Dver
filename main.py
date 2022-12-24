@@ -91,7 +91,6 @@ class Object:
         self.player_ani = True
         self.player_flip = False
         self.hurt = False
-        self.hurt_delay = False
         #self.reso = 3
         if(self.level == 9):
             self.level = 0
@@ -178,9 +177,6 @@ class Board:
         if (self.player_kill_idx >= 48):
             self.player_kill_idx = 1
             self.obj.player_kill_pos.clear()
-            if (self.obj.hurt):
-                self.obj.hurt_delay = False
-                self.sfx_spike_idx = 1
         self.player_touch_idx += 1
         self.player_touch_idx_int = int(self.player_touch_idx)
         self.sett.player_touch = pygame.image.load(f'assets/objects/player/player_touch_{self.player_touch_idx_int}.png')
@@ -188,9 +184,6 @@ class Board:
         if (self.player_touch_idx >= 39):
             self.player_touch_idx = 1
             self.obj.player_touch_pos.clear()
-            if (self.obj.hurt):
-                self.obj.hurt_delay = False
-                self.sfx_spike_idx = 1
         if (self.player_touch_idx >= 16):
             if (self.check_ske):
                 self.obj.ske_pos[self.next_ske_pos] = self.next_ske_loc
@@ -198,15 +191,14 @@ class Board:
             if (self.check_stone):
                 self.obj.stone_pos[self.next_stone_pos] = self.next_stone_loc
                 self.check_stone = False
-        if (not self.obj.hurt_delay):
-            self.sfx_spike_idx += 0.24
-            self.sfx_spike_idx_int = int(self.sfx_spike_idx)
-            self.sett.sfx_spike = pygame.image.load(f'assets/objects/sfx/spike_{self.sfx_spike_idx_int}.png')
-            self.sett.sfx_spike = pygame.transform.scale(self.sett.sfx_spike, (50, 50))
-            if (self.sfx_spike_idx >= 6):
-                self.sfx_spike_idx = 1
-                self.obj.hurt = False
-        
+        self.sfx_spike_idx += 0.25
+        self.sfx_spike_idx_int = int(self.sfx_spike_idx)
+        self.sett.sfx_spike = pygame.image.load(f'assets/objects/sfx/spike_{self.sfx_spike_idx_int}.png')
+        self.sett.sfx_spike = pygame.transform.scale(self.sett.sfx_spike, (50, 50))
+        if (self.sfx_spike_idx >= 8):
+            self.sfx_spike_idx = 1
+            self.obj.hurt = False
+                
     def _draw_main_menu(self):
         self.screen.blit(self.sett.background, (0, 0))
         if(self.obj.menu == 2):
@@ -321,7 +313,7 @@ class Board:
             self.screen.blit(pygame.transform.flip(self.sett.player_touch, self.obj.player_flip, 0), ((self.obj.player_touch_pos[1] + self.obj.col_count) * 50, (self.obj.player_touch_pos[0] + self.obj.row_count) * 50))        
         else:
             self.screen.blit(pygame.transform.flip(self.sett.player, self.obj.player_flip, 0), ((self.obj.player_pos[1] + self.obj.col_count) * 50, (self.obj.player_pos[0] + self.obj.row_count) * 50))        
-        if (self.obj.hurt and (not self.obj.hurt_delay)):
+        if (self.obj.hurt):
             self.screen.blit(pygame.transform.flip(self.sett.sfx_spike, self.obj.player_flip, 0), ((self.obj.player_pos[1] + self.obj.col_count) * 50, (self.obj.player_pos[0] + self.obj.row_count) * 50))        
         self._sprite();
 
@@ -392,7 +384,7 @@ class Board:
                     if(stand_spike):
                         self.act(0, dir)
                         self.obj.hurt = True
-                        self.obj.hurt_delay = True
+                        self.sfx_spike_idx = 1
                     self.obj.player_touch_pos.append(self.obj.player_pos[0])
                     self.obj.player_touch_pos.append(self.obj.player_pos[1])
                     self.player_touch_idx = 1
@@ -436,7 +428,7 @@ class Board:
                         self.act(2, dir)
                     if(stand_spike):
                         self.obj.hurt = True
-                        self.obj.hurt_delay = True
+                        self.sfx_spike_idx = 1
                         self.act(0, dir)
         elif(touch_key):
             key_count = -1
@@ -537,7 +529,7 @@ class Board:
                                 self.obj.__init__()
                                 pygame.mixer.music.stop()
                     else:
-                        if ((event.key in self.sett.KEY_DIR) and (self.obj.hurt_delay == False) and (self.obj.hurt == False) and (self.obj.player_pos != self.obj.player_kill_pos) and (self.obj.player_pos != self.obj.player_touch_pos)):
+                        if ((event.key in self.sett.KEY_DIR) and (self.obj.player_pos != self.obj.player_kill_pos) and (self.obj.player_pos != self.obj.player_touch_pos)):
                             self.move(self.sett.KEY_DIR[event.key])
                         elif event.key == pygame.K_ESCAPE:
                             self.obj.level = 0
