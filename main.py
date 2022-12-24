@@ -15,8 +15,11 @@ class Settings:
         self.font_ingame = int(self.height / 4.5)"""
         self.background = pygame.image.load('assets/backgrounds/background.jpg')
         self.background = pygame.transform.scale(self.background, (self.width, self.height))
+        self.loser = pygame.image.load('assets/backgrounds/loser.png')
+        self.loser = pygame.transform.scale(self.loser, (self.width, self.height))
         self.player = pygame.image.load('assets/objects/player/player.png')
         self.player = pygame.transform.scale(self.player, (50, 50))
+        self.player = pygame.transform.rotozoom(self.player, 0, 1)
         self.player_kill = pygame.image.load('assets/objects/player/player_kill_1.png')
         self.player_kill = pygame.transform.scale(self.player_kill, (50, 50))
         self.player_touch = pygame.image.load('assets/objects/player/player_touch_1.png')
@@ -35,12 +38,20 @@ class Settings:
         self.spike = pygame.transform.scale(self.spike, (50, 50))
         self.key = pygame.image.load('assets/objects/key.png')
         self.key = pygame.transform.scale(self.key, (50, 50))
-        self.lock = pygame.image.load('assets/objects/lock.png')
+        self.lock = pygame.image.load('assets/objects/lock/lock.png')
         self.lock = pygame.transform.scale(self.lock, (50, 50))
+        self.unlock = pygame.image.load('assets/objects/lock/unlock.png')
+        self.unlock = pygame.transform.scale(self.unlock, (50, 50))
         self.unspike = pygame.image.load('assets/objects/unspike.png')
         self.unspike = pygame.transform.scale(self.unspike, (50, 50))
         self.sfx_spike = pygame.image.load('assets/objects/sfx/spike_1.png')
         self.sfx_spike = pygame.transform.scale(self.sfx_spike, (50, 50))
+        self.lvl_frame = pygame.image.load(f'assets/backgrounds/frame.png')
+        self.lvl_frame = pygame.transform.scale(self.lvl_frame, (100, 100))
+        self.lvl_frame = pygame.transform.rotozoom(self.lvl_frame, 0, 1)
+        self.lvl_lock = pygame.image.load('assets/backgrounds/lock.png')
+        self.lvl_lock = pygame.transform.scale(self.lvl_lock, (50, 50))
+        self.lvl_frame_list = [[6, 4, 1], [10, 4, 2], [14, 4, 3], [18,4, 4], [6, 8, 5], [10, 8, 6], [14, 8, 7], [18, 8, 8]]
         self.KEY_DIR = {pygame.K_RIGHT: (1, 0), pygame.K_LEFT: (-1, 0), pygame.K_UP: (0, -1), pygame.K_DOWN: (0, 1)}
         #self.reso_list = [[640, 480], [800, 600], [1024, 720], [1280, 720], [1280, 768], [1360, 768], [1366, 768]]
         self.ingame = pygame.font.Font('assets/font/CrimsonPro-VariableFont_wght.ttf', 150)
@@ -78,9 +89,12 @@ class Object:
         self.player_touch_pos = []
         self.goal_pos = []
         self.getkey = False
+        self.unlock = False
         self.popup = True
         self.choose = 1
-        self.menu = 2
+        self.menu = 1
+        self.lvl_choose = 1
+        self.lvl_state = 1
         self.event_pos = []
         self.event_lose = False
         self.event_spawn = 300
@@ -91,11 +105,15 @@ class Object:
         self.player_ani = True
         self.player_flip = False
         self.hurt = False
+        self.level_list = []
         #self.reso = 3
         if(self.level == 9):
             self.level = 0
         if(self.level > 10):
             self.level = 1
+        with open('levels/lvl.txt', 'r') as f:
+            for row in f.read().splitlines():
+                self.level_list.append(int(row))
         with open(f'levels\level{self.level}.txt', 'r') as f:
             self.moves = int(f.readline())
             for row in f.read().splitlines():
@@ -156,25 +174,25 @@ class Board:
         self.ske_idle_idx_int = int(self.ske_idle_idx)
         self.sett.ske = pygame.image.load(f'assets/objects/skeleton/ske_idle_{self.ske_idle_idx_int}.png')
         self.sett.ske = pygame.transform.scale(self.sett.ske, (50, 50))
-        if (self.ske_idle_idx >= 11):
+        if (self.ske_idle_idx >= 11.84):
             self.react += 1
             if (self.react < 6):
                 self.ske_idle_idx = 1
-            elif (self.ske_idle_idx >= 15):
+            elif (self.ske_idle_idx >= 15.84):
                 self.ske_idle_idx = 1
                 self.react = 0
         self.ske_dead_idx += 0.24
         self.ske_dead_idx_int = int(self.ske_dead_idx)
         self.sett.ske_dead = pygame.image.load(f'assets/objects/skeleton/ske_dead_{self.ske_dead_idx_int}.png')
         self.sett.ske_dead = pygame.transform.scale(self.sett.ske_dead, (50, 50))
-        if (self.ske_dead_idx >= 15):
+        if (self.ske_dead_idx >= 15.75):
             self.ske_dead_idx = 1
             self.obj.ske_dead_pos.clear()
         self.player_kill_idx += 0.8
         self.player_kill_idx_int = int(self.player_kill_idx)
         self.sett.player_kill = pygame.image.load(f'assets/objects/player/player_kill_{self.player_kill_idx_int}.png')
         self.sett.player_kill = pygame.transform.scale(self.sett.player_kill, (50, 50))
-        if (self.player_kill_idx >= 48):
+        if (self.player_kill_idx >= 48.19):
             self.player_kill_idx = 1
             self.obj.player_kill_pos.clear()
         self.player_touch_idx += 1
@@ -201,26 +219,34 @@ class Board:
                 
     def _draw_main_menu(self):
         self.screen.blit(self.sett.background, (0, 0))
-        if(self.obj.menu == 2):
-            self.screen.blit(self.sett.main_menu.render("Bắt đầu", False, (255, 255, 255)), (11 * 50, 6 * 50))
-            self.screen.blit(self.sett.main_menu.render("Hardcore", False, (255, 255, 255)), (11 * 50, 7 * 50))
+        if(self.obj.menu == 1):
+            self.screen.blit(self.sett.main_menu.render("Game mới", False, (255, 255, 255)), (11 * 50, 6 * 50))
+            self.screen.blit(self.sett.main_menu.render("Chọn màn", False, (255, 255, 255)), (11 * 50, 7 * 50))
             self.screen.blit(self.sett.main_menu.render("Hướng dẫn", False, (255, 255, 255)), (11 * 50, 8 * 50))
             self.screen.blit(self.sett.main_menu.render("Credit", False, (255, 255, 255)), (11 * 50, 9 * 50))
             self.screen.blit(self.sett.main_menu.render("Minigame Tết", False, (255, 255, 255)), (11 * 50, 10 * 50))
             self.screen.blit(self.sett.main_menu_2.render("SPACE để chọn", False, (255, 255, 255)), (12 * 50, 12 * 50))
             self.screen.blit(self.sett.player, (self.obj.player_pos[1] * 50, self.obj.player_pos[0] * 50))
             self.screen.blit(self.sett.ingame.render("SUSUSUSUSUSUS", False, (255, 255, 255)), (2.5 * 50, 0.5 * 50))
-        elif(self.obj.menu == 1):
-            self.screen.blit(self.sett.tutorial.render("Giải cứu công chúa để qua màn", False, (255, 255, 255)), (5 * 50, 2 * 50))
+        elif(self.obj.menu == 2):
+            for pos in self.sett.lvl_frame_list:
+                self.screen.blit(self.sett.lvl_frame, (pos[0] * 50, pos[1] * 50))
+                self.screen.blit(self.sett.main_menu.render(str(pos[2]), False, (255, 255, 255)), ((pos[0] + 0.82) * 50, (pos[1] + 2) * 50))
+                if (not self.obj.level_list[pos[2]-1]):
+                    self.screen.blit(self.sett.lvl_lock, ((pos[0] + 0.5) * 50, (pos[1] + 0.5) * 50))
+            self.screen.blit(self.sett.player, (self.obj.player_pos[1] * 50, self.obj.player_pos[0] * 50))
+            self.screen.blit(self.sett.main_menu_2.render("SPACE để chọn, ESC để quay lại", False, (255, 255, 255)), (10.5 * 50, 12 * 50))
+        elif(self.obj.menu == 3):
+            self.screen.blit(self.sett.tutorial.render("Giải cứu sú pónk để qua màn", False, (255, 255, 255)), (5 * 50, 2 * 50))
             self.screen.blit(pygame.transform.scale(self.sett.goal, (100, 100)), (7 * 50, 3.5 * 50))
             self.screen.blit(self.sett.tutorial.render("Đẩy Người Xương vào Đá", False, (255, 255, 255)), (15 * 50, 2 * 50))
             self.screen.blit(self.sett.tutorial.render("hoặc Tường để giết", False, (255, 255, 255)), (15 * 50, 3 * 50))
             self.screen.blit(pygame.transform.scale(self.sett.ske, (75, 75)), (15 * 50, 5 * 50))
             self.screen.blit(pygame.transform.scale(self.sett.stone, (75, 75)), (18 * 50, 4 * 50))
             self.screen.blit(pygame.transform.scale(self.sett.wall, (75, 75)), (18 * 50, 6 * 50))
-            self.screen.blit(self.sett.tutorial.render("Nhặt chìa khoá để mở vật cản", False, (255, 255, 255)), (5 * 50, 7 * 50))
-            self.screen.blit(pygame.transform.scale(self.sett.key, (75, 75)), (6 * 50, 9 * 50))
-            self.screen.blit(pygame.transform.scale(self.sett.lock, (75, 75)), (9 * 50, 9 * 50))
+            self.screen.blit(self.sett.tutorial.render("Nhặt dao để chém chetme nó", False, (255, 255, 255)), (5 * 50, 7 * 50))
+            self.screen.blit(pygame.transform.scale(self.sett.key, (75, 75)), (6 * 50, 8 * 50))
+            self.screen.blit(pygame.transform.scale(self.sett.lock, (75, 75)), (9 * 50, 8 * 50))
             self.screen.blit(self.sett.tutorial.render("Cẩn thận hố gai", False, (255, 255, 255)), (15 * 50, 8 * 50))
             if((pygame.time.get_ticks() % 2000) in range(0, 1001)):
                 self.screen.blit(pygame.transform.scale(self.sett.spike, (75, 75)), (16 * 50, 9 * 50))
@@ -271,51 +297,57 @@ class Board:
                 self.obj.event_time_now += 1
         
     def _draw_board(self):
-        self.screen.blit(self.sett.background, (0, 0))
-        self.screen.blit(self.sett.main_menu_2.render("ESC để quay lại", False, (255, 255, 255)), (12 * 50, 12.5 * 50))
-        if(self.obj.moves > 9):
-            self.screen.blit(self.sett.ingame.render(str(self.obj.moves), False, (255, 255, 255)), (1.3 * 50, 9 * 50))
+        if(self.obj.moves == 0):
+            self.screen.blit(self.sett.loser, (0, 0))
         else:
-            self.screen.blit(self.sett.ingame.render(str(self.obj.moves), False, (255, 255, 255)), (2 * 50, 9 * 50))
-        if(self.obj.level < 10):
-            self.screen.blit(self.sett.ingame.render(str(self.obj.level), False, (255, 255, 255)), (22.5 * 50, 9 * 50))
-        else:
-            self.screen.blit(self.sett.ingame.render(str(self.obj.level), False, (255, 255, 255)), (22 * 50, 9 * 50))
-        for pos in self.obj.spike_pos:
-            self.screen.blit(self.sett.spike, ((pos[1] + self.obj.col_count) * 50, (pos[0] + self.obj.row_count) * 50))
-        if(self.obj.popup):
-            for pos in self.obj.holeb_pos:
+            self.screen.blit(self.sett.background, (0, 0))
+            self.screen.blit(self.sett.main_menu_2.render("ESC để quay lại", False, (255, 255, 255)), (12 * 50, 12.5 * 50))
+            if(self.obj.moves > 9):
+                self.screen.blit(self.sett.ingame.render(str(self.obj.moves), False, (255, 255, 255)), (1.3 * 50, 9 * 50))
+            else:
+                self.screen.blit(self.sett.ingame.render(str(self.obj.moves), False, (255, 255, 255)), (2 * 50, 9 * 50))
+            if(self.obj.level < 10):
+                self.screen.blit(self.sett.ingame.render(str(self.obj.level), False, (255, 255, 255)), (22.5 * 50, 9 * 50))
+            else:
+                self.screen.blit(self.sett.ingame.render(str(self.obj.level), False, (255, 255, 255)), (22 * 50, 9 * 50))
+            for pos in self.obj.spike_pos:
                 self.screen.blit(self.sett.spike, ((pos[1] + self.obj.col_count) * 50, (pos[0] + self.obj.row_count) * 50))
-            for pos in self.obj.holea_pos:
-                self.screen.blit(self.sett.unspike, ((pos[1] + self.obj.col_count) * 50, (pos[0] + self.obj.row_count) * 50))
-        else:
-            for pos in self.obj.holea_pos:
-                self.screen.blit(self.sett.spike, ((pos[1] + self.obj.col_count) * 50, (pos[0] + self.obj.row_count) * 50))
-            for pos in self.obj.holeb_pos:
-                self.screen.blit(self.sett.unspike, ((pos[1] + self.obj.col_count) * 50, (pos[0] + self.obj.row_count) * 50))
-        for pos in self.obj.key_pos:
-            self.screen.blit(self.sett.key, ((pos[1] + self.obj.col_count) * 50, (pos[0] + self.obj.row_count) * 50))
-        for pos in self.obj.stone_pos:
-            self.screen.blit(self.sett.stone, ((pos[1] + self.obj.col_count) * 50, (pos[0] + self.obj.row_count) * 50))
-        for pos in self.obj.wall_pos:
-            self.screen.blit(self.sett.wall, ((pos[1] + self.obj.col_count) * 50, (pos[0] + self.obj.row_count) * 50))
-        for pos in self.obj.goal_pos:
-            self.screen.blit(self.sett.goal, ((pos[1] + self.obj.col_count) * 50, (pos[0] + self.obj.row_count) * 50))
-        for pos in self.obj.ske_pos:
-            self.screen.blit(self.sett.ske, ((pos[1] + self.obj.col_count) * 50, (pos[0] + self.obj.row_count) * 50))
-        for pos in self.obj.ske_dead_pos:
-            self.screen.blit(self.sett.ske_dead, ((pos[1] + self.obj.col_count) * 50, (pos[0] + self.obj.row_count) * 50))
-        for pos in self.obj.lock_pos:
-            self.screen.blit(self.sett.lock, ((pos[1] + self.obj.col_count) * 50, (pos[0] + self.obj.row_count) * 50))
-        if (self.obj.player_kill_pos):
-            self.screen.blit(pygame.transform.flip(self.sett.player_kill, self.obj.player_flip, 0), ((self.obj.player_kill_pos[1] + self.obj.col_count) * 50, (self.obj.player_kill_pos[0] + self.obj.row_count) * 50))        
-        elif (self.obj.player_touch_pos):
-            self.screen.blit(pygame.transform.flip(self.sett.player_touch, self.obj.player_flip, 0), ((self.obj.player_touch_pos[1] + self.obj.col_count) * 50, (self.obj.player_touch_pos[0] + self.obj.row_count) * 50))        
-        else:
-            self.screen.blit(pygame.transform.flip(self.sett.player, self.obj.player_flip, 0), ((self.obj.player_pos[1] + self.obj.col_count) * 50, (self.obj.player_pos[0] + self.obj.row_count) * 50))        
-        if (self.obj.hurt):
-            self.screen.blit(pygame.transform.flip(self.sett.sfx_spike, self.obj.player_flip, 0), ((self.obj.player_pos[1] + self.obj.col_count) * 50, (self.obj.player_pos[0] + self.obj.row_count) * 50))        
-        self._sprite();
+            if(self.obj.popup):
+                for pos in self.obj.holeb_pos:
+                    self.screen.blit(self.sett.spike, ((pos[1] + self.obj.col_count) * 50, (pos[0] + self.obj.row_count) * 50))
+                for pos in self.obj.holea_pos:
+                    self.screen.blit(self.sett.unspike, ((pos[1] + self.obj.col_count) * 50, (pos[0] + self.obj.row_count) * 50))
+            else:
+                for pos in self.obj.holea_pos:
+                    self.screen.blit(self.sett.spike, ((pos[1] + self.obj.col_count) * 50, (pos[0] + self.obj.row_count) * 50))
+                for pos in self.obj.holeb_pos:
+                    self.screen.blit(self.sett.unspike, ((pos[1] + self.obj.col_count) * 50, (pos[0] + self.obj.row_count) * 50))
+            for pos in self.obj.key_pos:
+                self.screen.blit(self.sett.key, ((pos[1] + self.obj.col_count) * 50, (pos[0] + self.obj.row_count) * 50))
+            for pos in self.obj.stone_pos:
+                self.screen.blit(self.sett.stone, ((pos[1] + self.obj.col_count) * 50, (pos[0] + self.obj.row_count) * 50))
+            for pos in self.obj.wall_pos:
+                self.screen.blit(self.sett.wall, ((pos[1] + self.obj.col_count) * 50, (pos[0] + self.obj.row_count) * 50))
+            for pos in self.obj.goal_pos:
+                self.screen.blit(self.sett.goal, ((pos[1] + self.obj.col_count) * 50, (pos[0] + self.obj.row_count) * 50))
+            for pos in self.obj.ske_pos:
+                self.screen.blit(self.sett.ske, ((pos[1] + self.obj.col_count) * 50, (pos[0] + self.obj.row_count) * 50))
+            for pos in self.obj.ske_dead_pos:
+                self.screen.blit(self.sett.ske_dead, ((pos[1] + self.obj.col_count) * 50, (pos[0] + self.obj.row_count) * 50))
+            for pos in self.obj.lock_pos:
+                if (self.obj.unlock):
+                    self.screen.blit(self.sett.unlock, ((pos[1] + self.obj.col_count) * 50, (pos[0] + self.obj.row_count) * 50))
+                else:
+                    self.screen.blit(self.sett.lock, ((pos[1] + self.obj.col_count) * 50, (pos[0] + self.obj.row_count) * 50))
+            if (self.obj.player_kill_pos):
+                self.screen.blit(pygame.transform.flip(self.sett.player_kill, self.obj.player_flip, 0), ((self.obj.player_kill_pos[1] + self.obj.col_count) * 50, (self.obj.player_kill_pos[0] + self.obj.row_count) * 50))        
+            elif (self.obj.player_touch_pos):
+                self.screen.blit(pygame.transform.flip(self.sett.player_touch, self.obj.player_flip, 0), ((self.obj.player_touch_pos[1] + self.obj.col_count) * 50, (self.obj.player_touch_pos[0] + self.obj.row_count) * 50))        
+            else:
+                self.screen.blit(pygame.transform.flip(self.sett.player, self.obj.player_flip, 0), ((self.obj.player_pos[1] + self.obj.col_count) * 50, (self.obj.player_pos[0] + self.obj.row_count) * 50))        
+            if (self.obj.hurt):
+                self.screen.blit(pygame.transform.flip(self.sett.sfx_spike, self.obj.player_flip, 0), ((self.obj.player_pos[1] + self.obj.col_count) * 50, (self.obj.player_pos[0] + self.obj.row_count) * 50))        
+            self._sprite();
 
     def move(self, dir):
         if(dir[0] == -1):
@@ -347,7 +379,7 @@ class Board:
             touch_key = True
         else:
             touch_key = False
-        if(next_move in self.obj.lock_pos):
+        if((next_move in self.obj.lock_pos) and (self.obj.unlock == False)):
             touch_lock = True
         else:
             touch_lock = False
@@ -368,8 +400,14 @@ class Board:
                 del self.obj.ske_pos[ske_counts]
         if(touch_goal):
             self.obj.player_pos = [self.obj.player_pos[0] + dir[1], self.obj.player_pos[1] + dir[0]]
+            if(self.obj.level_list[self.obj.level] == 0):
+                with open('levels/lvl.txt', 'w') as f:
+                    self.obj.level_list[self.obj.level] = 1
+                    for lvl in self.obj.level_list:
+                        f.write(str(lvl) + "\n")
             self.obj.level += 1
             self.ske_idle_idx = 1
+            self.goal_idx = 1
             self.obj.__init__()
         elif(touch_stone):
             stone_count = -1
@@ -446,7 +484,7 @@ class Board:
                 lock_count += 1
                 if(next_move == pos):
                     if(self.obj.getkey):
-                        del self.obj.lock_pos[lock_count]
+                        self.obj.unlock = True
                         self.obj.getkey = False
                         self.act(1, dir)
         elif(touch_spike):
@@ -456,20 +494,23 @@ class Board:
             self.sfx_spike_idx = 1
         elif(not touch_wall and not touch_ske_dead):
             if(self.obj.level == 0):
-                if((self.obj.menu == 2) and (dir[1] != 0)):
+                if((self.obj.menu == 1) and (dir[1] != 0)):
                     if((self.obj.choose + dir[1]) in range(1, 6)):
                         self.obj.player_pos = next_move
                         self.obj.choose += dir[1]
-                """elif(self.obj.menu == 3):
-                    if(dir[1] != 0):
-                        if(self.obj.choose + dir[1] in range(1, 3)):
-                            self.obj.player_pos = next_move
-                            self.obj.choose += dir[1]
-                    elif(self.obj.choose == 1):
-                        if(self.obj.reso + dir[0] in range(0, 7)):
-                            self.sett.width = self.sett.reso_list[self.obj.reso+dir[0]][0]
-                            self.sett.height = self.sett.reso_list[self.obj.reso+dir[0]][1]
-                            self.obj.reso += dir[0]"""   
+                elif(self.obj.menu == 2):
+                    if(dir[0] != 0):
+                        if(((self.obj.lvl_choose + dir[0]) in range(1, 5) and (self.obj.lvl_state == 1)) or ((self.obj.lvl_choose + dir[0]) in range(5, 9) and (self.obj.lvl_state == 2))):
+                            if(self.obj.level_list[self.obj.lvl_choose + dir[0] - 1]):
+                                self.obj.player_pos = [self.obj.player_pos[0], self.obj.player_pos[1] + dir[0]*4]
+                                self.obj.lvl_choose += dir[0]
+                    else:
+                        if((self.obj.lvl_choose + dir[1]*4) in range(1, 9)):
+                            if(self.obj.level_list[self.obj.lvl_choose + dir[1]*4 - 1]):
+                                self.obj.player_pos = [self.obj.player_pos[0] + dir[1]*4, self.obj.player_pos[1]]
+                                self.obj.lvl_choose += dir[1]*4
+                                self.obj.lvl_state += dir[1]
+                    
             else:
                 self.act(1, dir)
             
@@ -497,62 +538,64 @@ class Board:
                         if event.key in self.sett.KEY_DIR:
                             self.move(self.sett.KEY_DIR[event.key])
                         if event.key == pygame.K_SPACE:
-                            if(self.obj.menu == 2):
+                            if(self.obj.menu == 1):
                                 if(self.obj.choose == 1):
                                     self.obj.level += 1
+                                    with open('levels/lvl.txt', 'w') as f:
+                                        f.write("1\n0\n0\n0\n0\n0\n0\n0")
                                     self.obj.__init__()
-                                    self.hardcore = False
                                 elif(self.obj.choose == 2):
-                                    self.obj.level += 1
-                                    self.obj.__init__()
-                                    self.hardcore = True
+                                    self.obj.menu += 1
+                                    self.obj.player_pos = [4.5, 6.5]
                                 elif(self.obj.choose == 3):
-                                    self.obj.menu -= 1
+                                    self.obj.menu += 2
                                     """elif(self.obj.choose == 4):
                                     self.obj.menu += 1
                                     self.obj.choose = 1
                                     self.obj.player_pos = [self.obj.player_pos[0] - 2, self.obj.player_pos[1]]"""
                                 elif(self.obj.choose == 5):
-                                    self.obj.menu += 2
+                                    self.obj.menu += 3
                                     self.obj.event_time = pygame.time.get_ticks()
                                     pygame.mixer.music.play(loops=-1)
-                            elif(self.obj.menu == 1):
-                                self.obj.menu += 1
+                            elif(self.obj.menu == 2):
+                                if(self.obj.level_list[self.obj.lvl_choose-1]):
+                                    self.obj.level = self.obj.lvl_choose
+                                    self.obj.__init__()
+                            elif(self.obj.menu == 3):
+                                self.obj.menu -= 2
                                 self.obj.choose = 1
                                 self.obj.player_pos = [self.obj.player_pos[0] - 2, self.obj.player_pos[1]]
-                                """elif(self.obj.menu == 3):
-                                if(self.obj.choose == 2):
-                                    self.obj.menu -= 1
-                                    self.obj.choose = 1
-                                    self.obj.player_pos = [self.obj.player_pos[0] - 1, self.obj.player_pos[1]]"""
+                            #elif(self.obj.menu == 3):
+                                #if(self.obj.choose == 2):
+                                    #self.obj.menu -= 1
+                                    #self.obj.choose = 1
+                                    #self.obj.player_pos = [self.obj.player_pos[0] - 1, self.obj.player_pos[1]]
                             elif(self.obj.menu == 4):
                                 self.obj.__init__()
                                 pygame.mixer.music.stop()
+                        if event.key == pygame.K_ESCAPE:
+                            if(self.obj.menu == 2):
+                                self.obj.__init__()
                     else:
                         if ((event.key in self.sett.KEY_DIR) and (self.obj.player_pos != self.obj.player_kill_pos) and (self.obj.player_pos != self.obj.player_touch_pos)):
-                            self.move(self.sett.KEY_DIR[event.key])
+                            if (self.obj.moves > 0):
+                                self.move(self.sett.KEY_DIR[event.key])
                         elif event.key == pygame.K_ESCAPE:
                             self.obj.level = 0
                             self.obj.__init__()
-                        elif(not self.hardcore):
-                            if event.key == pygame.K_r:
-                                self.ske_idle_idx = 1
-                                self.obj.__init__()
-                            elif event.key == pygame.K_l:
-                                self.obj.moves +=10
-                            elif event.key == pygame.K_z:
-                                self.obj.level += 1
-                                self.ske_idle_idx = 1
-                                self.obj.__init__()
-                            elif event.key == pygame.K_t:
-                                self.obj.level = 10
-                                self.ske_idle_idx = 1
-                                self.obj.__init__()
-                        
-            if (int(self.obj.moves) <= 0):
-                if(self.hardcore):
-                    self.obj.level = 1
-                self.obj.__init__()
+                        elif event.key == pygame.K_r:
+                            self.ske_idle_idx = 1
+                            self.obj.__init__()
+                        elif event.key == pygame.K_l:
+                            self.obj.moves +=10
+                        elif event.key == pygame.K_z:
+                            self.obj.level += 1
+                            self.ske_idle_idx = 1
+                            self.obj.__init__()
+                        elif event.key == pygame.K_t:
+                            self.obj.level = 10
+                            self.ske_idle_idx = 1
+                            self.obj.__init__()
             if(self.obj.level == 0):
                 self._draw_main_menu()
             else:
