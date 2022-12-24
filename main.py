@@ -15,21 +15,22 @@ class Settings:
         self.font_ingame = int(self.height / 4.5)"""
         self.background = pygame.image.load('assets/backgrounds/background.jpg')
         self.background = pygame.transform.scale(self.background, (self.width, self.height))
-        self.player = pygame.image.load('assets/objects/player.png')
+        self.player = pygame.image.load('assets/objects/player/player.png')
         self.player = pygame.transform.scale(self.player, (50, 50))
-        self.player_2 = pygame.image.load('assets/objects/Player1.png')
-        self.player_2 = pygame.transform.scale(self.player_2, (50, 50))
-        #self.player_rect = self.player.get_rect()
-        self.player_ani = [self.player, self.player_2]
-        self.player_index = 0
+        self.player_kill = pygame.image.load('assets/objects/player/player_kill_1.png')
+        self.player_kill = pygame.transform.scale(self.player_kill, (50, 50))
+        self.player_touch = pygame.image.load('assets/objects/player/player_touch_1.png')
+        self.player_touch = pygame.transform.scale(self.player_touch, (50, 50))
         self.stone = pygame.image.load('assets/objects/stone.png')
         self.stone = pygame.transform.scale(self.stone, (50, 50))
         self.wall = pygame.image.load('assets/objects/wall.png')
         self.wall = pygame.transform.scale(self.wall, (50, 50))
         self.goal = pygame.image.load('assets/objects/goal.png')
         self.goal = pygame.transform.scale(self.goal, (50, 50))
-        self.ske = pygame.image.load('assets/objects/ske.png')
+        self.ske = pygame.image.load('assets/objects/skeleton/ske_idle_1.png')
         self.ske = pygame.transform.scale(self.ske, (50, 50))
+        self.ske_dead = pygame.image.load('assets/objects/skeleton/ske_dead_1.png')
+        self.ske_dead = pygame.transform.scale(self.ske_dead, (50, 50))
         self.spike = pygame.image.load('assets/objects/spike.png')
         self.spike = pygame.transform.scale(self.spike, (50, 50))
         self.key = pygame.image.load('assets/objects/key.png')
@@ -38,6 +39,8 @@ class Settings:
         self.lock = pygame.transform.scale(self.lock, (50, 50))
         self.unspike = pygame.image.load('assets/objects/unspike.png')
         self.unspike = pygame.transform.scale(self.unspike, (50, 50))
+        self.sfx_spike = pygame.image.load('assets/objects/sfx/spike_1.png')
+        self.sfx_spike = pygame.transform.scale(self.sfx_spike, (50, 50))
         self.KEY_DIR = {pygame.K_RIGHT: (1, 0), pygame.K_LEFT: (-1, 0), pygame.K_UP: (0, -1), pygame.K_DOWN: (0, 1)}
         #self.reso_list = [[640, 480], [800, 600], [1024, 720], [1280, 720], [1280, 768], [1360, 768], [1366, 768]]
         self.ingame = pygame.font.Font('assets/font/CrimsonPro-VariableFont_wght.ttf', 150)
@@ -63,6 +66,7 @@ class Object:
         self.all_pos = []
         self.wall_pos = []
         self.ske_pos = []
+        self.ske_dead_pos = []
         self.stone_pos = []
         self.spike_pos = []
         self.holea_pos = []
@@ -70,6 +74,8 @@ class Object:
         self.key_pos = []
         self.lock_pos = []
         self.player_pos = []
+        self.player_kill_pos = []
+        self.player_touch_pos = []
         self.goal_pos = []
         self.getkey = False
         self.popup = True
@@ -83,6 +89,9 @@ class Object:
         self.event_time = 0
         self.event_time_now = 0
         self.player_ani = True
+        self.player_flip = False
+        self.hurt = False
+        self.hurt_delay = False
         #self.reso = 3
         if(self.level == 9):
             self.level = 0
@@ -130,6 +139,73 @@ class Board:
         self.screen = pygame.display.set_mode((self.sett.width, self.sett.height))
         pygame.display.set_caption("SUSUSUSUSUSUS")
         pygame.mouse.set_visible(False)
+        self.ske_idle_idx = 1
+        self.ske_dead_idx = 1
+        self.player_kill_idx = 1
+        self.player_touch_idx = 1
+        self.sfx_spike_idx = 1
+        self.react = 0
+        self.next_ske_pos = 0
+        self.next_ske_loc = []
+        self.check_ske = False
+        self.next_stone_pos = 0
+        self.next_stone_loc =[]
+        self.check_stone = False
+        
+    def _sprite(self):
+        self.ske_idle_idx += 0.15
+        self.ske_idle_idx_int = int(self.ske_idle_idx)
+        self.sett.ske = pygame.image.load(f'assets/objects/skeleton/ske_idle_{self.ske_idle_idx_int}.png')
+        self.sett.ske = pygame.transform.scale(self.sett.ske, (50, 50))
+        if (self.ske_idle_idx >= 11):
+            self.react += 1
+            if (self.react < 6):
+                self.ske_idle_idx = 1
+            elif (self.ske_idle_idx >= 15):
+                self.ske_idle_idx = 1
+                self.react = 0
+        self.ske_dead_idx += 0.24
+        self.ske_dead_idx_int = int(self.ske_dead_idx)
+        self.sett.ske_dead = pygame.image.load(f'assets/objects/skeleton/ske_dead_{self.ske_dead_idx_int}.png')
+        self.sett.ske_dead = pygame.transform.scale(self.sett.ske_dead, (50, 50))
+        if (self.ske_dead_idx >= 15):
+            self.ske_dead_idx = 1
+            self.obj.ske_dead_pos.clear()
+        self.player_kill_idx += 0.8
+        self.player_kill_idx_int = int(self.player_kill_idx)
+        self.sett.player_kill = pygame.image.load(f'assets/objects/player/player_kill_{self.player_kill_idx_int}.png')
+        self.sett.player_kill = pygame.transform.scale(self.sett.player_kill, (50, 50))
+        if (self.player_kill_idx >= 48):
+            self.player_kill_idx = 1
+            self.obj.player_kill_pos.clear()
+            if (self.obj.hurt):
+                self.obj.hurt_delay = False
+                self.sfx_spike_idx = 1
+        self.player_touch_idx += 1
+        self.player_touch_idx_int = int(self.player_touch_idx)
+        self.sett.player_touch = pygame.image.load(f'assets/objects/player/player_touch_{self.player_touch_idx_int}.png')
+        self.sett.player_touch = pygame.transform.scale(self.sett.player_touch, (50, 50))
+        if (self.player_touch_idx >= 39):
+            self.player_touch_idx = 1
+            self.obj.player_touch_pos.clear()
+            if (self.obj.hurt):
+                self.obj.hurt_delay = False
+                self.sfx_spike_idx = 1
+        if (self.player_touch_idx >= 16):
+            if (self.check_ske):
+                self.obj.ske_pos[self.next_ske_pos] = self.next_ske_loc
+                self.check_ske = False
+            if (self.check_stone):
+                self.obj.stone_pos[self.next_stone_pos] = self.next_stone_loc
+                self.check_stone = False
+        if (not self.obj.hurt_delay):
+            self.sfx_spike_idx += 0.24
+            self.sfx_spike_idx_int = int(self.sfx_spike_idx)
+            self.sett.sfx_spike = pygame.image.load(f'assets/objects/sfx/spike_{self.sfx_spike_idx_int}.png')
+            self.sett.sfx_spike = pygame.transform.scale(self.sett.sfx_spike, (50, 50))
+            if (self.sfx_spike_idx >= 6):
+                self.sfx_spike_idx = 1
+                self.obj.hurt = False
         
     def _draw_main_menu(self):
         self.screen.blit(self.sett.background, (0, 0))
@@ -235,19 +311,25 @@ class Board:
             self.screen.blit(self.sett.goal, ((pos[1] + self.obj.col_count) * 50, (pos[0] + self.obj.row_count) * 50))
         for pos in self.obj.ske_pos:
             self.screen.blit(self.sett.ske, ((pos[1] + self.obj.col_count) * 50, (pos[0] + self.obj.row_count) * 50))
+        for pos in self.obj.ske_dead_pos:
+            self.screen.blit(self.sett.ske_dead, ((pos[1] + self.obj.col_count) * 50, (pos[0] + self.obj.row_count) * 50))
         for pos in self.obj.lock_pos:
             self.screen.blit(self.sett.lock, ((pos[1] + self.obj.col_count) * 50, (pos[0] + self.obj.row_count) * 50))
-        self.screen.blit(self.sett.player_ani[int(self.sett.player_index)], ((self.obj.player_pos[1] + self.obj.col_count) * 50, (self.obj.player_pos[0] + self.obj.row_count) * 50))
-        if(self.obj.player_ani):
-            self.sett.player_index += 0.05
-            if(self.sett.player_index >= 1.9):
-                self.obj.player_ani = False
+        if (self.obj.player_kill_pos):
+            self.screen.blit(pygame.transform.flip(self.sett.player_kill, self.obj.player_flip, 0), ((self.obj.player_kill_pos[1] + self.obj.col_count) * 50, (self.obj.player_kill_pos[0] + self.obj.row_count) * 50))        
+        elif (self.obj.player_touch_pos):
+            self.screen.blit(pygame.transform.flip(self.sett.player_touch, self.obj.player_flip, 0), ((self.obj.player_touch_pos[1] + self.obj.col_count) * 50, (self.obj.player_touch_pos[0] + self.obj.row_count) * 50))        
         else:
-            self.sett.player_index -= 0.05
-            if(self.sett.player_index <= 0):
-                self.obj.player_ani = True
-        
+            self.screen.blit(pygame.transform.flip(self.sett.player, self.obj.player_flip, 0), ((self.obj.player_pos[1] + self.obj.col_count) * 50, (self.obj.player_pos[0] + self.obj.row_count) * 50))        
+        if (self.obj.hurt and (not self.obj.hurt_delay)):
+            self.screen.blit(pygame.transform.flip(self.sett.sfx_spike, self.obj.player_flip, 0), ((self.obj.player_pos[1] + self.obj.col_count) * 50, (self.obj.player_pos[0] + self.obj.row_count) * 50))        
+        self._sprite();
+
     def move(self, dir):
+        if(dir[0] == -1):
+            self.obj.player_flip = True
+        elif(dir[0] == 1):
+            self.obj.player_flip = False
         next_move = [self.obj.player_pos[0] + dir[1], self.obj.player_pos[1] + dir[0]]
         if((self.obj.player_pos in self.obj.spike_pos) or ((self.obj.player_pos in self.obj.holea_pos) and (self.obj.popup == True)) or ((self.obj.player_pos in self.obj.holeb_pos) and (self.obj.popup == False))):
             stand_spike = True
@@ -265,6 +347,10 @@ class Board:
             touch_ske = True
         else:
             touch_ske = False
+        if(next_move in self.obj.ske_dead_pos):
+            touch_ske_dead = True
+        else:
+            touch_ske_dead = False
         if(next_move in self.obj.key_pos):
             touch_key = True
         else:
@@ -285,10 +371,13 @@ class Board:
         for pos in self.obj.ske_pos:
             ske_counts += 1
             if(((pos in self.obj.holea_pos) and (self.obj.popup == True)) or ((pos in self.obj.holeb_pos) and (self.obj.popup == False))):
+                self.ske_dead_idx = 1
+                self.obj.ske_dead_pos.append(self.obj.ske_pos[ske_counts])
                 del self.obj.ske_pos[ske_counts]
         if(touch_goal):
             self.obj.player_pos = [self.obj.player_pos[0] + dir[1], self.obj.player_pos[1] + dir[0]]
             self.obj.level += 1
+            self.ske_idle_idx = 1
             self.obj.__init__()
         elif(touch_stone):
             stone_count = -1
@@ -297,9 +386,17 @@ class Board:
                 if(next_move == pos):
                     next_stone = [pos[0] + dir[1], pos[1] + dir[0]]
                     if(next_stone not in (self.obj.wall_pos + self.obj.stone_pos + self.obj.ske_pos + self.obj.lock_pos + self.obj.goal_pos)):
-                        self.obj.stone_pos[stone_count] = next_stone
+                        self.next_stone_pos = stone_count
+                        self.next_stone_loc = next_stone
+                        self.check_stone = True
                     if(stand_spike):
                         self.act(0, dir)
+                        self.obj.hurt = True
+                        self.obj.hurt_delay = True
+                    self.obj.player_touch_pos.append(self.obj.player_pos[0])
+                    self.obj.player_touch_pos.append(self.obj.player_pos[1])
+                    self.player_touch_idx = 1
+                    self.obj.player_ani = False
                     self.act(2, dir)
         elif(touch_ske):
             ske_count = -1
@@ -310,16 +407,37 @@ class Board:
                     if(next_ske in self.obj.goal_pos):
                         ""
                     else:
-                        if(next_ske not in (self.obj.wall_pos + self.obj.stone_pos + self.obj.ske_pos + self.obj.lock_pos + self.obj.spike_pos)):
-                            if(((next_ske in self.obj.holea_pos) and (self.obj.popup == True)) or ((next_ske in self.obj.holeb_pos) and (self.obj.popup == False))):
-                                del self.obj.ske_pos[ske_count]
+                        if(next_ske not in (self.obj.wall_pos + self.obj.stone_pos + self.obj.ske_pos + self.obj.lock_pos)):
+                            if((next_ske in  self.obj.spike_pos) or ((next_ske in self.obj.holea_pos) and (self.obj.popup == True)) or ((next_ske in self.obj.holeb_pos) and (self.obj.popup == False))):
+                                self.ske_dead_idx = 1
+                                self.obj.ske_dead_pos.append(next_ske)
+                                self.obj.player_touch_pos.append(self.obj.player_pos[0])
+                                self.obj.player_touch_pos.append(self.obj.player_pos[1])
+                                self.player_touch_idx = 1
+                                del self.obj.ske_pos[ske_count]                               
                             else:
-                                self.obj.ske_pos[ske_count] = next_ske
+                                self.obj.player_touch_pos.append(self.obj.player_pos[0])
+                                self.obj.player_touch_pos.append(self.obj.player_pos[1])
+                                self.player_touch_idx = 1
+                                self.next_ske_pos = ske_count
+                                self.next_ske_loc = next_ske
+                                self.check_ske = True
                         else:
+                            if(next_ske in self.obj.spike_pos):
+                                self.ske_dead_idx = 1
+                                self.obj.ske_dead_pos.append(next_ske)
+                            else:
+                                self.ske_dead_idx = 1
+                                self.obj.ske_dead_pos.append(self.obj.ske_pos[ske_count])
+                            self.obj.player_kill_pos.append(self.obj.player_pos[0])
+                            self.obj.player_kill_pos.append(self.obj.player_pos[1])
+                            self.player_kill_idx = 1
                             del self.obj.ske_pos[ske_count]
                         self.act(2, dir)
                     if(stand_spike):
-                        self.act(0, dir)                     
+                        self.obj.hurt = True
+                        self.obj.hurt_delay = True
+                        self.act(0, dir)
         elif(touch_key):
             key_count = -1
             for pos in self.obj.key_pos:
@@ -342,7 +460,9 @@ class Board:
         elif(touch_spike):
             self.act(0, dir)
             self.act(1, dir)
-        elif(not touch_wall):
+            self.obj.hurt = True
+            self.sfx_spike_idx = 1
+        elif(not touch_wall and not touch_ske_dead):
             if(self.obj.level == 0):
                 if((self.obj.menu == 2) and (dir[1] != 0)):
                     if((self.obj.choose + dir[1]) in range(1, 6)):
@@ -364,11 +484,7 @@ class Board:
 
     def act(self, possive, dir):
         if(possive == 1):
-            for i in range (0, 10):                
-                self.obj.player_pos = [round(self.obj.player_pos[0] + dir[1]/10, 1), round(self.obj.player_pos[1] + dir[0]/10, 1)]
-                self.screen.blit(self.sett.player_ani[int(self.sett.player_index)], ((self.obj.player_pos[1] + self.obj.col_count) * 50, (self.obj.player_pos[0] + self.obj.row_count) * 50))
-                pygame.time.delay(100)
-                print(self.obj.player_pos)
+            self.obj.player_pos = [self.obj.player_pos[0] + dir[1], self.obj.player_pos[1] + dir[0]]
             self.obj.moves -= 1
             self.obj.popup = not self.obj.popup
         elif(possive == 2):
@@ -377,6 +493,7 @@ class Board:
         else:
             self.obj.moves -=1
         
+    
     def run(self):
         while True:
             self.sett.timer.tick(self.sett.fps)
@@ -420,21 +537,24 @@ class Board:
                                 self.obj.__init__()
                                 pygame.mixer.music.stop()
                     else:
-                        if event.key in self.sett.KEY_DIR:
+                        if ((event.key in self.sett.KEY_DIR) and (self.obj.hurt_delay == False) and (self.obj.hurt == False) and (self.obj.player_pos != self.obj.player_kill_pos) and (self.obj.player_pos != self.obj.player_touch_pos)):
                             self.move(self.sett.KEY_DIR[event.key])
                         elif event.key == pygame.K_ESCAPE:
                             self.obj.level = 0
                             self.obj.__init__()
                         elif(not self.hardcore):
                             if event.key == pygame.K_r:
+                                self.ske_idle_idx = 1
                                 self.obj.__init__()
                             elif event.key == pygame.K_l:
                                 self.obj.moves +=10
                             elif event.key == pygame.K_z:
                                 self.obj.level += 1
+                                self.ske_idle_idx = 1
                                 self.obj.__init__()
                             elif event.key == pygame.K_t:
                                 self.obj.level = 10
+                                self.ske_idle_idx = 1
                                 self.obj.__init__()
                         
             if (int(self.obj.moves) <= 0):
