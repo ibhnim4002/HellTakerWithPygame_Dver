@@ -19,7 +19,6 @@ class Settings:
         self.loser = pygame.transform.scale(self.loser, (self.width, self.height))
         self.player = pygame.image.load('assets/objects/player/player.png')
         self.player = pygame.transform.scale(self.player, (50, 50))
-        self.player = pygame.transform.rotozoom(self.player, 0, 1)
         self.player_kill = pygame.image.load('assets/objects/player/player_kill_1.png')
         self.player_kill = pygame.transform.scale(self.player_kill, (50, 50))
         self.player_touch = pygame.image.load('assets/objects/player/player_touch_1.png')
@@ -95,17 +94,18 @@ class Object:
         self.menu = 1
         self.lvl_choose = 1
         self.lvl_state = 1
-        self.event_pos = []
-        self.event_lose = False
-        self.event_spawn = 300
-        self.event_speed = 0.3
-        self.event_player_pos = (650, 350)
-        self.event_time = 0
-        self.event_time_now = 0
         self.player_ani = True
         self.player_flip = False
         self.hurt = False
         self.level_list = []
+        self.event_pos = []
+        self.event_lose = False
+        self.event_spawn = 4
+        self.event_spawn_check = True
+        self.event_speed = 0.6
+        self.event_time = 0
+        self.event_time_now = 0
+        self.event_time_old = 0
         #self.reso = 3
         if(self.level == 9):
             self.level = 0
@@ -156,6 +156,7 @@ class Board:
         self.screen = pygame.display.set_mode((self.sett.width, self.sett.height))
         pygame.display.set_caption("SUSUSUSUSUSUS")
         pygame.mouse.set_visible(False)
+        pygame.event.set_grab(True)
         self.ske_idle_idx = 1
         self.ske_dead_idx = 1
         self.player_kill_idx = 1
@@ -168,7 +169,8 @@ class Board:
         self.next_stone_pos = 0
         self.next_stone_loc =[]
         self.check_stone = False
-        
+        self.event_player_rect = self.sett.player.get_rect(center = (650, 350))
+
     def _sprite(self):
         self.ske_idle_idx += 0.15
         self.ske_idle_idx_int = int(self.ske_idle_idx)
@@ -220,11 +222,12 @@ class Board:
     def _draw_main_menu(self):
         self.screen.blit(self.sett.background, (0, 0))
         if(self.obj.menu == 1):
-            self.screen.blit(self.sett.main_menu.render("Game mới", False, (255, 255, 255)), (11 * 50, 6 * 50))
-            self.screen.blit(self.sett.main_menu.render("Chọn màn", False, (255, 255, 255)), (11 * 50, 7 * 50))
-            self.screen.blit(self.sett.main_menu.render("Hướng dẫn", False, (255, 255, 255)), (11 * 50, 8 * 50))
-            self.screen.blit(self.sett.main_menu.render("Credit", False, (255, 255, 255)), (11 * 50, 9 * 50))
-            self.screen.blit(self.sett.main_menu.render("Minigame Tết", False, (255, 255, 255)), (11 * 50, 10 * 50))
+            self.screen.blit(self.sett.main_menu.render("Game mới", False, (255, 255, 255)), (11 * 50, 5 * 50))
+            self.screen.blit(self.sett.main_menu.render("Chọn màn", False, (255, 255, 255)), (11 * 50, 6 * 50))
+            self.screen.blit(self.sett.main_menu.render("Hướng dẫn", False, (255, 255, 255)), (11 * 50, 7 * 50))
+            self.screen.blit(self.sett.main_menu.render("Credit", False, (255, 255, 255)), (11 * 50, 8 * 50))
+            self.screen.blit(self.sett.main_menu.render("Minigame Tết", False, (255, 255, 255)), (11 * 50, 9 * 50))
+            self.screen.blit(self.sett.main_menu.render("Thoát", False, (255, 255, 255)), (11 * 50, 10 * 50))
             self.screen.blit(self.sett.main_menu_2.render("SPACE để chọn", False, (255, 255, 255)), (12 * 50, 12 * 50))
             self.screen.blit(self.sett.player, (self.obj.player_pos[1] * 50, self.obj.player_pos[0] * 50))
             self.screen.blit(self.sett.ingame.render("SUSUSUSUSUSUS", False, (255, 255, 255)), (2.5 * 50, 0.5 * 50))
@@ -253,49 +256,51 @@ class Board:
             else:
                 self.screen.blit(pygame.transform.scale(self.sett.unspike, (75, 75)), (16 * 50, 9 * 50))
             self.screen.blit(self.sett.main_menu_2.render("SPACE để tiếp tục", False, (255, 255, 255)), (12 * 50, 12 * 50))
-            """elif(self.obj.menu == 3):
+            """elif(self.obj.menu == 4):
             self.screen.blit(self.sett.main_menu.render("", False, (255, 255, 255)), (11 * 50, 5 * 50))
             self.screen.blit(self.sett.main_menu.render("", False, (255, 255, 255)), (11 * 50, 6 * 50))
             self.screen.blit(self.sett.main_menu.render("", False, (255, 255, 255)), (11 * 50, 6 * 50))
             self.screen.blit(self.sett.main_menu.render("", False, (255, 255, 255)), (11 * 50, 6 * 50))
-            self.screen.blit(self.sett.main_menu_2.render("SPACE để tiếp tục", False, (255, 255, 255)), (10 * 50, 12 * 50))"""
-        elif(self.obj.menu == 4):
+            self.screen.blit(self.sett.main_menu_2.render("SPACE để tiếp tục", False, (255, 255, 255)), (10 * 50, 12 * 50))"""     
+        elif(self.obj.menu == 5):
             self.screen.blit(self.sett.main_menu_2.render("SPACE để quay lại", False, (255, 255, 255)), (12 * 50, 12 * 50))
             self.screen.blit(self.sett.main_menu_2.render("Time: ", False, (255, 255, 255)), (16 * 50, 12 * 50))
             self.screen.blit(self.sett.main_menu_2.render(str(self.obj.event_time_now), False, (255, 255, 255)), (17 * 50, 12 * 50))
-            if(pygame.mouse.get_pos()[0] in range(0, 1250) and pygame.mouse.get_pos()[1] in range (0, 650)):
-                self.obj.event_player_pos = pygame.mouse.get_pos()
-            self.screen.blit(self.sett.player, self.obj.event_player_pos)
-            self.event_spawn = pygame.USEREVENT + 1
-            pygame.time.set_timer(self.event_spawn, self.obj.event_spawn)
             if(self.obj.event_lose):
                 self.screen.blit(self.sett.ingame.render("Tết này bạn đã nghèo", False, (255, 255, 255)), (0.3 * 50, 5.5 * 50))
             else:
-                if(self.event_spawn):
-                    self.spawn = [random.randint(10, 1290), random.randint(10, 690)]
-                    self.spawn_rect = self.spawn.get_rect()
-                    self.obj.event_player_pos_rect = self.obj.event_player_pos.get_rect()
-                    if(math.dist(self.spawn_rect.center, self.obj.event_player_pos_rect.center) > 200): 
-                        self.obj.event_pos.append((self.sett.main_menu_2.render("nghèo", False, (255, 255, 255)), (0, 0)).get_rect(topleft = self.spawn))
+                self.event_player_rect.center = pygame.mouse.get_pos()
                 for pos in self.obj.event_pos:
                     self.screen.blit(self.sett.main_menu_2.render("nghèo", False, (255, 255, 255)), pos)
-                    if(pos.x > self.obj.event_player_pos[0]):
+                    if(pos.x > self.event_player_rect.center[0]):
                         pos.x -= (self.obj.event_speed*1.1)
-                    elif(pos.x < self.obj.event_player_pos[0]):
-                        pos.x += (self.obj.event_speed*1.1)
-                    if(pos.y > self.obj.event_player_pos[1]):
+                    elif(pos.x < self.event_player_rect.center[0]):
+                        pos.x += (self.obj.event_speed*2*1.1)
+                    if(pos.y > self.event_player_rect.center[1]):
                         pos.y -= self.obj.event_speed
-                    elif(pos.y < self.obj.event_player_pos[1]):
-                        pos.y += self.obj.event_speed
-                    if(math.dist((pos[0]+15, pos[1]+10), (self.obj.event_player_pos[0]+25,self.obj.event_player_pos[1]+25)) < 25):
+                    elif(pos.y < self.event_player_rect.center[1]):
+                        pos.y += (self.obj.event_speed*2)
+                    if(pos.colliderect(self.event_player_rect)):
                         self.obj.event_lose = True
-            if((pygame.time.get_ticks() % 5500) == 0):
-                if(self.obj.event_spawn > 20):
-                    self.obj.event_spawn -= 20
-                self.obj.event_speed += 0.04
-            if((pygame.time.get_ticks() - self.obj.event_time) % 1000 == 0):
-                self.obj.event_time_now += 1
-        
+                if((self.obj.event_time_now % int(self.obj.event_spawn) == 0) and self.obj.event_spawn_check):
+                    self.event()
+                self.obj.event_time_now = int((pygame.time.get_ticks() - self.obj.event_time)/1000)
+                if(self.obj.event_time_now > self.obj.event_time_old):
+                    self.obj.event_time_old = self.obj.event_time_now
+                    self.obj.event_spawn_check = True
+            self.screen.blit(self.sett.player, self.event_player_rect)
+            
+    def event(self):
+        self.spawn = [random.randint(10, 1290), random.randint(10, 690)]
+        new_spawn = self.sett.main_menu_2.render("nghèo", False, (255, 255, 255)).get_rect(topleft = self.spawn)
+        if (math.dist(new_spawn.center, self.event_player_rect.center) > 200):
+            self.obj.event_pos.append(new_spawn)
+        if(self.obj.event_spawn > 1.2):
+            self.obj.event_spawn -= 0.2
+        self.obj.event_speed += 0.04
+        self.obj.event_spawn_check = False
+
+                
     def _draw_board(self):
         if(self.obj.moves == 0):
             self.screen.blit(self.sett.loser, (0, 0))
@@ -495,7 +500,7 @@ class Board:
         elif(not touch_wall and not touch_ske_dead):
             if(self.obj.level == 0):
                 if((self.obj.menu == 1) and (dir[1] != 0)):
-                    if((self.obj.choose + dir[1]) in range(1, 6)):
+                    if((self.obj.choose + dir[1]) in range(1, 7)):
                         self.obj.player_pos = next_move
                         self.obj.choose += dir[1]
                 elif(self.obj.menu == 2):
@@ -510,7 +515,6 @@ class Board:
                                 self.obj.player_pos = [self.obj.player_pos[0] + dir[1]*4, self.obj.player_pos[1]]
                                 self.obj.lvl_choose += dir[1]*4
                                 self.obj.lvl_state += dir[1]
-                    
             else:
                 self.act(1, dir)
             
@@ -554,9 +558,12 @@ class Board:
                                     self.obj.choose = 1
                                     self.obj.player_pos = [self.obj.player_pos[0] - 2, self.obj.player_pos[1]]"""
                                 elif(self.obj.choose == 5):
-                                    self.obj.menu += 3
+                                    self.obj.menu += 4
+                                    self.event_player_rect.center = (650, 350)
                                     self.obj.event_time = pygame.time.get_ticks()
                                     pygame.mixer.music.play(loops=-1)
+                                elif(self.obj.choose == 6):
+                                    pygame.quit()
                             elif(self.obj.menu == 2):
                                 if(self.obj.level_list[self.obj.lvl_choose-1]):
                                     self.obj.level = self.obj.lvl_choose
@@ -570,7 +577,7 @@ class Board:
                                     #self.obj.menu -= 1
                                     #self.obj.choose = 1
                                     #self.obj.player_pos = [self.obj.player_pos[0] - 1, self.obj.player_pos[1]]
-                            elif(self.obj.menu == 4):
+                            elif(self.obj.menu == 5):
                                 self.obj.__init__()
                                 pygame.mixer.music.stop()
                         if event.key == pygame.K_ESCAPE:
