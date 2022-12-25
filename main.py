@@ -10,10 +10,7 @@ class Settings:
         self.fps = 60
         self.width = 1300
         self.height = 700
-        self.screen = pygame.display.set_mode((self.width, self.height), pygame.RESIZABLE)
-        """self.obj_size = int(self.height / 14)
-        self.row_size = int(self.width / self.obj_size)
-        self.font_ingame = int(self.height / 4.5)"""
+        self.screen = pygame.display.set_mode((self.width, self.height))
         self.background = pygame.image.load('assets/backgrounds/background.jpg').convert_alpha()
         self.background = pygame.transform.scale(self.background, (self.width, self.height))
         self.loser = pygame.image.load('assets/backgrounds/loser.png').convert_alpha()
@@ -66,7 +63,6 @@ class Settings:
         self.lvl_frame_list = [[6, 4, 1], [10, 4, 2], [14, 4, 3], [18,4, 4], [6, 8, 5], [10, 8, 6], [14, 8, 7], [18, 8, 8]]
         self.KEY_DIR = {pygame.K_RIGHT: (1, 0), pygame.K_LEFT: (-1, 0), pygame.K_UP: (0, -1), pygame.K_DOWN: (0, 1)}
         self.event_list = {1: "nghèo", 2: "rớt môn", 3: "thấy crush đi lấy chồng", 4: "điểm thấp", 5: "chia tay", 6: "thấy waifu bị dduj tắt thở"}
-        #self.reso_list = [[640, 480], [800, 600], [1024, 720], [1280, 720], [1280, 768], [1360, 768], [1366, 768]]
         self.ingame = pygame.font.Font('assets/font/CrimsonPro-VariableFont_wght.ttf', 150)
         self.minigame = pygame.font.Font('assets/font/CrimsonPro-VariableFont_wght.ttf', 100)
         self.tutorial = pygame.font.Font('assets/font/CrimsonPro-VariableFont_wght.ttf', 30)
