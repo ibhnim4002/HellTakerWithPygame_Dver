@@ -10,7 +10,7 @@ class Settings:
         self.fps = 60
         self.width = 1300
         self.height = 700
-        self.screen = pygame.display.set_mode((self.width, self.height))
+        self.screen = pygame.display.set_mode((self.width, self.height), pygame.RESIZABLE)
         """self.obj_size = int(self.height / 14)
         self.row_size = int(self.width / self.obj_size)
         self.font_ingame = int(self.height / 4.5)"""
@@ -656,6 +656,7 @@ class Board:
                                         self.cre_run = 0
                                     elif(self.obj.choose == 5):
                                         self.obj.menu = 5
+                                        pygame.mouse.set_pos(650, 350)
                                         self.event_player_rect.center = (650, 350)
                                         self.obj.event_time = pygame.time.get_ticks()
                                         pygame.mixer.music.play(loops=-1)
