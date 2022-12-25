@@ -52,9 +52,10 @@ class Settings:
         self.lvl_lock = pygame.transform.scale(self.lvl_lock, (50, 50))
         self.lvl_frame_list = [[6, 4, 1], [10, 4, 2], [14, 4, 3], [18,4, 4], [6, 8, 5], [10, 8, 6], [14, 8, 7], [18, 8, 8]]
         self.KEY_DIR = {pygame.K_RIGHT: (1, 0), pygame.K_LEFT: (-1, 0), pygame.K_UP: (0, -1), pygame.K_DOWN: (0, 1)}
-        self.event_list = {1: "nghèo", 2: "rớt môn", 3: "thấy crush có bồ", 4: "điểm thấp", 5: "chia tay", 6: "thấy waifu bị dduj tắt thở"}
+        self.event_list = {1: "nghèo", 2: "rớt môn", 3: "thấy crush đi lấy chồng", 4: "điểm thấp", 5: "chia tay", 6: "thấy waifu bị dduj tắt thở"}
         #self.reso_list = [[640, 480], [800, 600], [1024, 720], [1280, 720], [1280, 768], [1360, 768], [1366, 768]]
         self.ingame = pygame.font.Font('assets/font/CrimsonPro-VariableFont_wght.ttf', 150)
+        self.minigame = pygame.font.Font('assets/font/CrimsonPro-VariableFont_wght.ttf', 100)
         self.tutorial = pygame.font.Font('assets/font/CrimsonPro-VariableFont_wght.ttf', 30)
         self.main_menu = pygame.font.Font('assets/font/CrimsonPro-VariableFont_wght.ttf', 50)
         self.main_menu_2 = pygame.font.Font('assets/font/CrimsonPro-VariableFont_wght.ttf', 20)
@@ -269,8 +270,8 @@ class Board:
             self.screen.blit(self.sett.tutorial.render("Time: ", False, (255, 255, 255)), (16 * 50, 11.85 * 50))
             self.screen.blit(self.sett.tutorial.render(str(self.obj.event_time_now), False, (255, 255, 255)), (17.6 * 50, 11.85 * 50))
             if(self.obj.event_lose):
-                self.screen.blit(self.sett.ingame.render("Tết này bạn đã", False, (255, 255, 255)), (3 * 50, 4 * 50))
-                self.screen.blit(self.sett.ingame.render(f"{self.sett.event_list[self.obj.event_lose_by]}", False, (255, 255, 255)), (3 * 50, 7 * 50))
+                self.screen.blit(self.sett.minigame.render("Tết này bạn đã", False, (255, 255, 255)), (3 * 50, 4 * 50))
+                self.screen.blit(self.sett.minigame.render(f"{self.sett.event_list[self.obj.event_lose_by]}", False, (255, 255, 255)), (3 * 50, 7 * 50))
             else:
                 self.event_player_rect.center = pygame.mouse.get_pos()
                 for pos in self.obj.event_pos:
