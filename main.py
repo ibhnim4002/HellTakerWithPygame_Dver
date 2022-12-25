@@ -17,6 +17,10 @@ class Settings:
         self.background = pygame.transform.scale(self.background, (self.width, self.height))
         self.loser = pygame.image.load('assets/backgrounds/loser.png')
         self.loser = pygame.transform.scale(self.loser, (self.width, self.height))
+        self.succ = pygame.image.load('assets/backgrounds/success.png')
+        self.succ = pygame.transform.scale(self.succ, (self.width, self.height))
+        self.fsucc = pygame.image.load('assets/backgrounds/final_success.png')
+        self.fsucc = pygame.transform.scale(self.fsucc, (self.width, self.height))
         self.player = pygame.image.load('assets/objects/player/player.png')
         self.player = pygame.transform.scale(self.player, (50, 50))
         self.player_kill = pygame.image.load('assets/objects/player/player_kill_1.png')
@@ -119,6 +123,7 @@ class Object:
         self.event_time_now = 0
         self.event_time_old = 0
         self.quit = False
+        self.levelup = False
         #self.reso = 3
         if(self.level == 9):
             self.level = 0
@@ -357,6 +362,13 @@ class Board:
     def _draw_board(self):
         if(self.obj.moves == 0):
             self.screen.blit(self.sett.loser, (0, 0))
+            self.screen.blit(self.sett.tutorial.render("R để chơi lại", False, (255, 255, 255)), (11.5 * 50, 11 * 50))
+        if(self.obj.levelup):
+            if(self.obj.level == 8):
+                self.screen.blit(self.sett.fsucc, (0, 0))
+            else:
+                self.screen.blit(self.sett.succ, (0, 0))
+            self.screen.blit(self.sett.tutorial.render("SPACE để tiếp tục", False, (255, 255, 255)), (11 * 50, 11 * 50))
         else:
             self.screen.blit(self.sett.background, (0, 0))
             self.screen.blit(self.sett.main_menu_2.render("ESC để quay lại", False, (255, 255, 255)), (12 * 50, 12.5 * 50))
@@ -460,14 +472,7 @@ class Board:
                 del self.obj.ske_pos[ske_counts]
         if(touch_goal):
             self.obj.player_pos = [self.obj.player_pos[0] + dir[1], self.obj.player_pos[1] + dir[0]]
-            if(self.obj.level_list[self.obj.level] == 0):
-                with open('levels/lvl.txt', 'w') as f:
-                    self.obj.level_list[self.obj.level] = 1
-                    for lvl in self.obj.level_list:
-                        f.write(str(lvl) + "\n")
-            self.obj.level += 1
-            self.ske_idle_idx = 1
-            self.obj.__init__()
+            self.obj.levelup = True
         elif(touch_stone):
             stone_count = -1
             for pos in self.obj.stone_pos:
@@ -677,6 +682,16 @@ class Board:
                             self.obj.__init__()
                         elif event.key == pygame.K_t:
                             self.obj.level = 10
+                            self.ske_idle_idx = 1
+                            self.obj.__init__()
+                        elif((event.key == pygame.K_SPACE) and self.obj.levelup):
+                            if(self.obj.level < 8):
+                                if(self.obj.level_list[self.obj.level] == 0):
+                                    with open('levels/lvl.txt', 'w') as f:
+                                        self.obj.level_list[self.obj.level] = 1
+                                        for lvl in self.obj.level_list:
+                                            f.write(str(lvl) + "\n")
+                            self.obj.level += 1
                             self.ske_idle_idx = 1
                             self.obj.__init__()
             if(self.obj.level == 0):
