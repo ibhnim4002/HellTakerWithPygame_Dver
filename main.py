@@ -50,6 +50,8 @@ class Settings:
         self.lvl_frame = pygame.transform.rotozoom(self.lvl_frame, 0, 1)
         self.lvl_lock = pygame.image.load('assets/backgrounds/lock.png')
         self.lvl_lock = pygame.transform.scale(self.lvl_lock, (50, 50))
+        self.quit = pygame.image.load('assets/backgrounds/quit.png')
+        self.quit = pygame.transform.scale(self.quit, (900, 75))
         self.lvl_frame_list = [[6, 4, 1], [10, 4, 2], [14, 4, 3], [18,4, 4], [6, 8, 5], [10, 8, 6], [14, 8, 7], [18, 8, 8]]
         self.KEY_DIR = {pygame.K_RIGHT: (1, 0), pygame.K_LEFT: (-1, 0), pygame.K_UP: (0, -1), pygame.K_DOWN: (0, 1)}
         self.event_list = {1: "nghèo", 2: "rớt môn", 3: "thấy crush đi lấy chồng", 4: "điểm thấp", 5: "chia tay", 6: "thấy waifu bị dduj tắt thở"}
@@ -109,6 +111,7 @@ class Object:
         self.event_time = 0
         self.event_time_now = 0
         self.event_time_old = 0
+        self.quit = False
         #self.reso = 3
         if(self.level == 9):
             self.level = 0
@@ -225,15 +228,22 @@ class Board:
     def _draw_main_menu(self):
         self.screen.blit(self.sett.background, (0, 0))
         if(self.obj.menu == 1):
-            self.screen.blit(self.sett.main_menu.render("Game mới", False, (255, 255, 255)), (11 * 50, 5 * 50))
-            self.screen.blit(self.sett.main_menu.render("Chọn màn", False, (255, 255, 255)), (11 * 50, 6 * 50))
-            self.screen.blit(self.sett.main_menu.render("Hướng dẫn", False, (255, 255, 255)), (11 * 50, 7 * 50))
-            self.screen.blit(self.sett.main_menu.render("Credit", False, (255, 255, 255)), (11 * 50, 8 * 50))
-            self.screen.blit(self.sett.main_menu.render("Minigame Tết", False, (255, 255, 255)), (11 * 50, 9 * 50))
-            self.screen.blit(self.sett.main_menu.render("Thoát", False, (255, 255, 255)), (11 * 50, 10 * 50))
-            self.screen.blit(self.sett.main_menu_2.render("SPACE để chọn", False, (255, 255, 255)), (12 * 50, 12 * 50))
-            self.screen.blit(self.sett.player, (self.obj.player_pos[1] * 50, self.obj.player_pos[0] * 50))
-            self.screen.blit(self.sett.ingame.render("SUSUSUSUSUSUS", False, (255, 255, 255)), (2.5 * 50, 0.5 * 50))
+            if(self.obj.quit):
+                self.screen.blit(self.sett.main_menu.render("Ở lại đi mà", False, (255, 255, 255)), (11 * 50, 4 * 50))
+                self.screen.blit(self.sett.main_menu.render("Ô kê", False, (255, 255, 255)), (10 * 50, 7 * 50))
+                self.screen.blit(self.sett.main_menu.render("Khồng", False, (255, 255, 255)), (15 * 50, 7 * 50))
+                self.screen.blit(self.sett.player, (self.obj.player_pos[1] * 50, self.obj.player_pos[0] * 50))
+                self.screen.blit(self.sett.quit, (4 * 50, 10 * 50))
+            else:
+                self.screen.blit(self.sett.main_menu.render("Game mới", False, (255, 255, 255)), (11 * 50, 5 * 50))
+                self.screen.blit(self.sett.main_menu.render("Chọn màn", False, (255, 255, 255)), (11 * 50, 6 * 50))
+                self.screen.blit(self.sett.main_menu.render("Hướng dẫn", False, (255, 255, 255)), (11 * 50, 7 * 50))
+                self.screen.blit(self.sett.main_menu.render("Credit", False, (255, 255, 255)), (11 * 50, 8 * 50))
+                self.screen.blit(self.sett.main_menu.render("Minigame Tết", False, (255, 255, 255)), (11 * 50, 9 * 50))
+                self.screen.blit(self.sett.main_menu.render("Thoát", False, (255, 255, 255)), (11 * 50, 10 * 50))
+                self.screen.blit(self.sett.main_menu_2.render("SPACE để chọn", False, (255, 255, 255)), (12 * 50, 12 * 50))
+                self.screen.blit(self.sett.player, (self.obj.player_pos[1] * 50, self.obj.player_pos[0] * 50))
+                self.screen.blit(self.sett.ingame.render("SUSUSUSUSUSUS", False, (255, 255, 255)), (2.5 * 50, 0.5 * 50))
         elif(self.obj.menu == 2):
             for pos in self.sett.lvl_frame_list:
                 self.screen.blit(self.sett.lvl_frame, (pos[0] * 50, pos[1] * 50))
@@ -506,28 +516,34 @@ class Board:
             self.sfx_spike_idx = 1
         elif(not touch_wall and not touch_ske_dead):
             if(self.obj.level == 0):
-                if((self.obj.menu == 1) and (dir[1] != 0)):
-                    if((self.obj.choose + dir[1]) in range(1, 7)):
-                        self.obj.player_pos = next_move
-                        self.obj.choose += dir[1]
-                    elif((self.obj.choose + dir[1]) < 1):
-                        self.obj.player_pos = [self.obj.player_pos[0] - dir[1]*5, self.obj.player_pos[1]]
-                        self.obj.choose = 6
-                    elif((self.obj.choose + dir[1]) > 6):
-                        self.obj.player_pos = [self.obj.player_pos[0] - dir[1]*5, self.obj.player_pos[1]]
-                        self.obj.choose = 1
-                elif(self.obj.menu == 2):
+                if(self.obj.quit):
                     if(dir[0] != 0):
-                        if(((self.obj.lvl_choose + dir[0]) in range(1, 5) and (self.obj.lvl_state == 1)) or ((self.obj.lvl_choose + dir[0]) in range(5, 9) and (self.obj.lvl_state == 2))):
-                            if(self.obj.level_list[self.obj.lvl_choose + dir[0] - 1]):
-                                self.obj.player_pos = [self.obj.player_pos[0], self.obj.player_pos[1] + dir[0]*4]
-                                self.obj.lvl_choose += dir[0]
-                    else:
-                        if((self.obj.lvl_choose + dir[1]*4) in range(1, 9)):
-                            if(self.obj.level_list[self.obj.lvl_choose + dir[1]*4 - 1]):
-                                self.obj.player_pos = [self.obj.player_pos[0] + dir[1]*4, self.obj.player_pos[1]]
-                                self.obj.lvl_choose += dir[1]*4
-                                self.obj.lvl_state += dir[1]
+                        if(self.obj.choose + dir[0] in range(1, 3)):
+                            self.obj.player_pos = [self.obj.player_pos[0], self.obj.player_pos[1] + dir[0]*5]
+                            self.obj.choose += dir[0]
+                else:
+                    if((self.obj.menu == 1) and (dir[1] != 0)):
+                        if((self.obj.choose + dir[1]) in range(1, 7)):
+                            self.obj.player_pos = next_move
+                            self.obj.choose += dir[1]
+                        elif((self.obj.choose + dir[1]) < 1):
+                            self.obj.player_pos = [self.obj.player_pos[0] - dir[1]*5, self.obj.player_pos[1]]
+                            self.obj.choose = 6
+                        elif((self.obj.choose + dir[1]) > 6):
+                            self.obj.player_pos = [self.obj.player_pos[0] - dir[1]*5, self.obj.player_pos[1]]
+                            self.obj.choose = 1
+                    elif(self.obj.menu == 2):
+                        if(dir[0] != 0):
+                            if(((self.obj.lvl_choose + dir[0]) in range(1, 5) and (self.obj.lvl_state == 1)) or ((self.obj.lvl_choose + dir[0]) in range(5, 9) and (self.obj.lvl_state == 2))):
+                                if(self.obj.level_list[self.obj.lvl_choose + dir[0] - 1]):
+                                    self.obj.player_pos = [self.obj.player_pos[0], self.obj.player_pos[1] + dir[0]*4]
+                                    self.obj.lvl_choose += dir[0]
+                        else:
+                            if((self.obj.lvl_choose + dir[1]*4) in range(1, 9)):
+                                if(self.obj.level_list[self.obj.lvl_choose + dir[1]*4 - 1]):
+                                    self.obj.player_pos = [self.obj.player_pos[0] + dir[1]*4, self.obj.player_pos[1]]
+                                    self.obj.lvl_choose += dir[1]*4
+                                    self.obj.lvl_state += dir[1]
             else:
                 self.act(1, dir)
             
@@ -556,27 +572,35 @@ class Board:
                             self.move(self.sett.KEY_DIR[event.key])
                         if event.key == pygame.K_SPACE:
                             if(self.obj.menu == 1):
-                                if(self.obj.choose == 1):
-                                    self.obj.level += 1
-                                    with open('levels/lvl.txt', 'w') as f:
-                                        f.write("1\n0\n0\n0\n0\n0\n0\n0")
-                                    self.obj.__init__()
-                                elif(self.obj.choose == 2):
-                                    self.obj.menu += 1
-                                    self.obj.player_pos = [4.5, 6.5]
-                                elif(self.obj.choose == 3):
-                                    self.obj.menu += 2
-                                    """elif(self.obj.choose == 4):
-                                    self.obj.menu += 1
-                                    self.obj.choose = 1
-                                    self.obj.player_pos = [self.obj.player_pos[0] - 2, self.obj.player_pos[1]]"""
-                                elif(self.obj.choose == 5):
-                                    self.obj.menu += 4
-                                    self.event_player_rect.center = (650, 350)
-                                    self.obj.event_time = pygame.time.get_ticks()
-                                    pygame.mixer.music.play(loops=-1)
-                                elif(self.obj.choose == 6):
-                                    pygame.quit()
+                                if(not self.obj.quit):
+                                    if(self.obj.choose == 1):
+                                        self.obj.level += 1
+                                        with open('levels/lvl.txt', 'w') as f:
+                                            f.write("1\n0\n0\n0\n0\n0\n0\n0")
+                                        self.obj.__init__()
+                                    elif(self.obj.choose == 2):
+                                        self.obj.menu += 1
+                                        self.obj.player_pos = [4.5, 6.5]
+                                    elif(self.obj.choose == 3):
+                                        self.obj.menu += 2
+                                        """elif(self.obj.choose == 4):
+                                        self.obj.menu += 1
+                                        self.obj.choose = 1
+                                        self.obj.player_pos = [self.obj.player_pos[0] - 2, self.obj.player_pos[1]]"""
+                                    elif(self.obj.choose == 5):
+                                        self.obj.menu += 4
+                                        self.event_player_rect.center = (650, 350)
+                                        self.obj.event_time = pygame.time.get_ticks()
+                                        pygame.mixer.music.play(loops=-1)
+                                    elif(self.obj.choose == 6):
+                                        self.obj.choose = 1
+                                        self.obj.player_pos = [7, 9]
+                                        self.obj.quit = True
+                                else:
+                                    if(self.obj.choose == 1):
+                                        self.obj.__init__()
+                                    elif(self.obj.choose == 2):
+                                        pygame.quit()
                             elif(self.obj.menu == 2):
                                 if(self.obj.level_list[self.obj.lvl_choose-1]):
                                     self.obj.level = self.obj.lvl_choose
