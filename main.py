@@ -28,6 +28,8 @@ class Settings:
         self.player_kill = pygame.transform.scale(self.player_kill, (50, 50))
         self.player_touch = pygame.image.load('assets/objects/player/player_touch_1.png').convert_alpha()
         self.player_touch = pygame.transform.scale(self.player_touch, (50, 50))
+        self.player_walk = pygame.image.load('assets/objects/player/player_walk_1.png').convert_alpha()
+        self.player_walk = pygame.transform.scale(self.player_walk, (50, 50))
         self.stone = pygame.image.load('assets/objects/stone.png').convert_alpha()
         self.stone = pygame.transform.scale(self.stone, (50, 50))
         self.wall = pygame.image.load('assets/objects/wall.png').convert_alpha()
@@ -101,6 +103,8 @@ class Object:
         self.player_pos = []
         self.player_kill_pos = []
         self.player_touch_pos = []
+        self.player_walk_pos = []
+        self.player_walk_dir = []
         self.cre = []
         self.goal_pos = []
         self.getkey = False
@@ -110,9 +114,9 @@ class Object:
         self.menu = 1
         self.lvl_choose = 1
         self.lvl_state = 1
-        self.player_ani = True
         self.player_flip = False
         self.hurt = False
+        self.walk = False
         self.level_list = []
         self.event_pos = []
         self.event_lose = False
@@ -188,9 +192,10 @@ class Board:
         self.ske_dead_idx = 1
         self.player_kill_idx = 1
         self.player_touch_idx = 1
+        self.player_walk_idx = 1
         self.sfx_spike_idx = 1
         self.holea_idx = 1
-        self.holeb_idx = 4.75
+        self.holeb_idx = 4.8
         self.react = 0
         self.next_ske_pos = 0
         self.next_ske_loc = []
@@ -246,29 +251,41 @@ class Board:
             if(self.check_stone):
                 self.obj.stone_pos[self.next_stone_pos] = self.next_stone_loc
                 self.check_stone = False
-        self.sfx_spike_idx += 0.25
-        self.sfx_spike_idx_int = int(self.sfx_spike_idx)
-        self.sett.sfx_spike = pygame.image.load(f'assets/objects/sfx/spike_{self.sfx_spike_idx_int}.png').convert_alpha()
-        self.sett.sfx_spike = pygame.transform.scale(self.sett.sfx_spike, (50, 50))
-        if(self.sfx_spike_idx >= 8.74):
-            self.sfx_spike_idx = 1
-            self.obj.hurt = False
+        if(not self.obj.walk):
+            self.sfx_spike_idx += 0.25
+            self.sfx_spike_idx_int = int(self.sfx_spike_idx)
+            self.sett.sfx_spike = pygame.image.load(f'assets/objects/sfx/spike_{self.sfx_spike_idx_int}.png').convert_alpha()
+            self.sett.sfx_spike = pygame.transform.scale(self.sett.sfx_spike, (50, 50))
+            if(self.sfx_spike_idx >= 8.74):
+                self.sfx_spike_idx = 1
+                self.obj.hurt = False
         if(self.holea_popup):
-            self.holea_idx += 0.25
+            self.holea_idx += 0.2
             self.holea_idx_int = int(self.holea_idx)
             self.sett.holea = pygame.image.load(f'assets/objects/spike/spike_{self.holea_idx_int}.png').convert_alpha()
             self.sett.holea = pygame.transform.scale(self.sett.holea, (50, 50))
-            if(self.holea_idx >= 4.74):
+            if(self.holea_idx >= 4.79):
                 self.holea_idx = 1
                 self.holea_popup = False
         if(self.holeb_popup):
-            self.holeb_idx -= 0.25
+            self.holeb_idx -= 0.2
             self.holeb_idx_int = int(self.holeb_idx)
             self.sett.holeb = pygame.image.load(f'assets/objects/spike/spike_{self.holeb_idx_int}.png').convert_alpha()
             self.sett.holeb = pygame.transform.scale(self.sett.holeb, (50, 50))
-            if(self.holeb_idx <= 1.26):
-                self.holeb_idx = 4.75
+            if(self.holeb_idx <= 1.21):
+                self.holeb_idx = 4.8
                 self.holeb_popup = False
+        if(self.obj.walk):
+            self.player_walk_idx += 0.75
+            self.obj.player_walk_pos = [self.obj.player_walk_pos[0] + self.obj.player_walk_dir[1]*0.06, self.obj.player_walk_pos[1] + self.obj.player_walk_dir[0]*0.06]
+            self.player_walk_idx_int = int(self.player_walk_idx)
+            self.sett.player_walk = pygame.image.load(f'assets/objects/player/player_walk_{self.player_walk_idx_int}.png').convert_alpha()
+            self.sett.player_walk = pygame.transform.scale(self.sett.player_walk, (50, 50))
+            if(self.player_walk_idx >= 12.24):
+                self.player_walk_idx = 1
+                self.obj.player_walk_pos.clear()
+                self.obj.player_walk_dir.clear()
+                self.obj.walk = False
                 
     def _draw_main_menu(self):
         self.sett.screen.blit(self.sett.background, (0, 0))
@@ -357,7 +374,6 @@ class Board:
             self.obj.event_spawn -= 0.15
         self.obj.event_speed += 0.03
         self.obj.event_spawn_check = False
-
                 
     def _draw_board(self):
         if(self.obj.moves <= 0):
@@ -411,13 +427,15 @@ class Board:
                     self.sett.screen.blit(self.sett.unlock, ((pos[1] + self.obj.col_count) * 50, (pos[0] + self.obj.row_count) * 50))
                 else:
                     self.sett.screen.blit(self.sett.lock, ((pos[1] + self.obj.col_count) * 50, (pos[0] + self.obj.row_count) * 50))
-            if(self.obj.player_kill_pos):
+            if(self.obj.walk):
+                self.sett.screen.blit(pygame.transform.flip(self.sett.player_walk, self.obj.player_flip, 0), ((self.obj.player_walk_pos[1] + self.obj.col_count) * 50, (self.obj.player_walk_pos[0] + self.obj.row_count) * 50))        
+            if(self.obj.player_kill_pos and not self.obj.walk):
                 self.sett.screen.blit(pygame.transform.flip(self.sett.player_kill, self.obj.player_flip, 0), ((self.obj.player_kill_pos[1] + self.obj.col_count) * 50, (self.obj.player_kill_pos[0] + self.obj.row_count) * 50))        
-            elif(self.obj.player_touch_pos):
+            elif(self.obj.player_touch_pos and not self.obj.walk):
                 self.sett.screen.blit(pygame.transform.flip(self.sett.player_touch, self.obj.player_flip, 0), ((self.obj.player_touch_pos[1] + self.obj.col_count) * 50, (self.obj.player_touch_pos[0] + self.obj.row_count) * 50))        
-            else:
+            elif(not self.obj.walk):
                 self.sett.screen.blit(pygame.transform.flip(self.sett.player, self.obj.player_flip, 0), ((self.obj.player_pos[1] + self.obj.col_count) * 50, (self.obj.player_pos[0] + self.obj.row_count) * 50))        
-            if(self.obj.hurt):
+            if(self.obj.hurt and not self.obj.walk):
                 self.sett.screen.blit(pygame.transform.flip(self.sett.sfx_spike, self.obj.player_flip, 0), ((self.obj.player_pos[1] + self.obj.col_count) * 50, (self.obj.player_pos[0] + self.obj.row_count) * 50))        
             self._sprite();
 
@@ -490,7 +508,6 @@ class Board:
                     self.obj.player_touch_pos.append(self.obj.player_pos[0])
                     self.obj.player_touch_pos.append(self.obj.player_pos[1])
                     self.player_touch_idx = 1
-                    self.obj.player_ani = False
                     self.act(2, dir)
         elif(touch_ske):
             ske_count = -1
@@ -592,8 +609,13 @@ class Board:
 
     def act(self, possive, dir):
         if(possive == 1):
+            self.obj.player_walk_pos.append(self.obj.player_pos[0])
+            self.obj.player_walk_pos.append(self.obj.player_pos[1])
+            self.obj.player_walk_dir.append(dir[0])
+            self.obj.player_walk_dir.append(dir[1])
             self.obj.player_pos = [self.obj.player_pos[0] + dir[1], self.obj.player_pos[1] + dir[0]]
             self.obj.moves -= 1
+            self.obj.walk = True
             self.obj.popup = not self.obj.popup
             self.holea_popup = not self.holea_popup
             self.holeb_popup = not self.holeb_popup
@@ -665,7 +687,7 @@ class Board:
                             if(self.obj.menu == 2):
                                 self.obj.__init__()
                     else:
-                        if((event.key in self.sett.KEY_DIR) and (self.obj.player_pos != self.obj.player_kill_pos) and (self.obj.player_pos != self.obj.player_touch_pos)):
+                        if((event.key in self.sett.KEY_DIR) and (not self.obj.walk) and (self.obj.player_pos != self.obj.player_kill_pos) and (self.obj.player_pos != self.obj.player_touch_pos)):
                             if(self.obj.moves > 0):
                                 self.move(self.sett.KEY_DIR[event.key])
                         elif event.key == pygame.K_ESCAPE:
