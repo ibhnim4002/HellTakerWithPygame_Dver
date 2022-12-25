@@ -52,6 +52,7 @@ class Settings:
         self.lvl_lock = pygame.transform.scale(self.lvl_lock, (50, 50))
         self.lvl_frame_list = [[6, 4, 1], [10, 4, 2], [14, 4, 3], [18,4, 4], [6, 8, 5], [10, 8, 6], [14, 8, 7], [18, 8, 8]]
         self.KEY_DIR = {pygame.K_RIGHT: (1, 0), pygame.K_LEFT: (-1, 0), pygame.K_UP: (0, -1), pygame.K_DOWN: (0, 1)}
+        self.event_list = {1: "nghèo", 2: "rớt môn", 3: "thấy crush có bồ", 4: "điểm thấp", 5: "chia tay"}
         #self.reso_list = [[640, 480], [800, 600], [1024, 720], [1280, 720], [1280, 768], [1360, 768], [1366, 768]]
         self.ingame = pygame.font.Font('assets/font/CrimsonPro-VariableFont_wght.ttf', 150)
         self.tutorial = pygame.font.Font('assets/font/CrimsonPro-VariableFont_wght.ttf', 30)
@@ -100,6 +101,7 @@ class Object:
         self.level_list = []
         self.event_pos = []
         self.event_lose = False
+        self.event_lose_by = 1
         self.event_spawn = 4
         self.event_spawn_check = True
         self.event_speed = 0.6
@@ -267,21 +269,23 @@ class Board:
             self.screen.blit(self.sett.tutorial.render("Time: ", False, (255, 255, 255)), (16 * 50, 11.85 * 50))
             self.screen.blit(self.sett.tutorial.render(str(self.obj.event_time_now), False, (255, 255, 255)), (17.6 * 50, 11.85 * 50))
             if(self.obj.event_lose):
-                self.screen.blit(self.sett.ingame.render("Tết này bạn đã nghèo", False, (255, 255, 255)), (0.3 * 50, 5.5 * 50))
+                self.screen.blit(self.sett.ingame.render("Tết này bạn đã", False, (255, 255, 255)), (3 * 50, 4 * 50))
+                self.screen.blit(self.sett.ingame.render(f"{self.sett.event_list[self.obj.event_lose_by]}", False, (255, 255, 255)), (3 * 50, 7 * 50))
             else:
                 self.event_player_rect.center = pygame.mouse.get_pos()
                 for pos in self.obj.event_pos:
-                    self.screen.blit(self.sett.main_menu_2.render("nghèo", False, (255, 255, 255)), pos)
-                    if(pos.x > self.event_player_rect.center[0]):
-                        pos.x -= (self.obj.event_speed*1.1)
-                    elif(pos.x < self.event_player_rect.center[0]):
-                        pos.x += (self.obj.event_speed*2*1.1)
-                    if(pos.y > self.event_player_rect.center[1]):
-                        pos.y -= self.obj.event_speed
-                    elif(pos.y < self.event_player_rect.center[1]):
-                        pos.y += (self.obj.event_speed*2)
-                    if(pos.colliderect(self.event_player_rect)):
+                    self.screen.blit(self.sett.main_menu_2.render(f"{self.sett.event_list[pos[1]]}", False, (255, 255, 255)), pos[0])
+                    if(pos[0].x > self.event_player_rect.center[0]):
+                        pos[0].x -= (self.obj.event_speed*1.1)
+                    elif(pos[0].x < self.event_player_rect.center[0]):
+                        pos[0].x += (self.obj.event_speed*2*1.1)
+                    if(pos[0].y > self.event_player_rect.center[1]):
+                        pos[0].y -= self.obj.event_speed
+                    elif(pos[0].y < self.event_player_rect.center[1]):
+                        pos[0].y += (self.obj.event_speed*2)
+                    if(pos[0].colliderect(self.event_player_rect)):
                         self.obj.event_lose = True
+                        self.obj.event_lose_by = pos[1]
                 if((self.obj.event_time_now % int(self.obj.event_spawn) == 0) and self.obj.event_spawn_check):
                     self.event()
                 self.obj.event_time_now = int((pygame.time.get_ticks() - self.obj.event_time)/1000)
@@ -291,11 +295,12 @@ class Board:
             self.screen.blit(self.sett.player, self.event_player_rect)
             
     def event(self):
-        for i in range (0, int(self.obj.event_spawn)+1):
+        for i in range (0, random.randint(1, int(self.obj.event_spawn)+3)):
             self.spawn = [random.randint(-120, 1420), random.randint(-120, 820)]
-            new_spawn = self.sett.main_menu_2.render("nghèo", False, (255, 255, 255)).get_rect(topleft = self.spawn)
+            event = random.randint(1, 5)
+            new_spawn = self.sett.main_menu_2.render(f"{self.sett.event_list[event]}", False, (255, 255, 255)).get_rect(topleft = self.spawn)
             if (math.dist(new_spawn.center, self.event_player_rect.center) > 400):
-                self.obj.event_pos.append(new_spawn)
+                self.obj.event_pos.append([new_spawn, event])
         if(self.obj.event_spawn > 1.2):
             self.obj.event_spawn -= 0.15
         self.obj.event_speed += 0.03
@@ -504,6 +509,12 @@ class Board:
                     if((self.obj.choose + dir[1]) in range(1, 7)):
                         self.obj.player_pos = next_move
                         self.obj.choose += dir[1]
+                    elif((self.obj.choose + dir[1]) < 1):
+                        self.obj.player_pos = [self.obj.player_pos[0] - dir[1]*5, self.obj.player_pos[1]]
+                        self.obj.choose = 6
+                    elif((self.obj.choose + dir[1]) > 6):
+                        self.obj.player_pos = [self.obj.player_pos[0] - dir[1]*5, self.obj.player_pos[1]]
+                        self.obj.choose = 1
                 elif(self.obj.menu == 2):
                     if(dir[0] != 0):
                         if(((self.obj.lvl_choose + dir[0]) in range(1, 5) and (self.obj.lvl_state == 1)) or ((self.obj.lvl_choose + dir[0]) in range(5, 9) and (self.obj.lvl_state == 2))):
