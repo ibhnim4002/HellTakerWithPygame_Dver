@@ -264,8 +264,8 @@ class Board:
             self.screen.blit(self.sett.main_menu_2.render("SPACE để tiếp tục", False, (255, 255, 255)), (10 * 50, 12 * 50))"""     
         elif(self.obj.menu == 5):
             self.screen.blit(self.sett.main_menu_2.render("SPACE để quay lại", False, (255, 255, 255)), (12 * 50, 12 * 50))
-            self.screen.blit(self.sett.main_menu_2.render("Time: ", False, (255, 255, 255)), (16 * 50, 12 * 50))
-            self.screen.blit(self.sett.main_menu_2.render(str(self.obj.event_time_now), False, (255, 255, 255)), (17 * 50, 12 * 50))
+            self.screen.blit(self.sett.tutorial.render("Time: ", False, (255, 255, 255)), (16 * 50, 11.85 * 50))
+            self.screen.blit(self.sett.tutorial.render(str(self.obj.event_time_now), False, (255, 255, 255)), (17.6 * 50, 11.85 * 50))
             if(self.obj.event_lose):
                 self.screen.blit(self.sett.ingame.render("Tết này bạn đã nghèo", False, (255, 255, 255)), (0.3 * 50, 5.5 * 50))
             else:
@@ -291,13 +291,14 @@ class Board:
             self.screen.blit(self.sett.player, self.event_player_rect)
             
     def event(self):
-        self.spawn = [random.randint(10, 1290), random.randint(10, 690)]
-        new_spawn = self.sett.main_menu_2.render("nghèo", False, (255, 255, 255)).get_rect(topleft = self.spawn)
-        if (math.dist(new_spawn.center, self.event_player_rect.center) > 200):
-            self.obj.event_pos.append(new_spawn)
+        for i in range (0, int(self.obj.event_spawn)+1):
+            self.spawn = [random.randint(-120, 1420), random.randint(-120, 820)]
+            new_spawn = self.sett.main_menu_2.render("nghèo", False, (255, 255, 255)).get_rect(topleft = self.spawn)
+            if (math.dist(new_spawn.center, self.event_player_rect.center) > 400):
+                self.obj.event_pos.append(new_spawn)
         if(self.obj.event_spawn > 1.2):
-            self.obj.event_spawn -= 0.2
-        self.obj.event_speed += 0.04
+            self.obj.event_spawn -= 0.15
+        self.obj.event_speed += 0.03
         self.obj.event_spawn_check = False
 
                 
