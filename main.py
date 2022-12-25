@@ -27,6 +27,8 @@ class Settings:
         self.stone = pygame.transform.scale(self.stone, (50, 50))
         self.wall = pygame.image.load('assets/objects/wall.png')
         self.wall = pygame.transform.scale(self.wall, (50, 50))
+        self.hwall = pygame.image.load('assets/objects/highwall.png')
+        self.hwall = pygame.transform.scale(self.hwall, (50, 50))
         self.goal = pygame.image.load('assets/objects/goal.png')
         self.goal = pygame.transform.scale(self.goal, (50, 50))
         self.ske = pygame.image.load('assets/objects/skeleton/ske_idle_1.png')
@@ -68,6 +70,7 @@ class Settings:
 
 class Object:
     wall_list = ['#']
+    hwall_list = ['$']
     player_list = ['p', 'P']
     stone_list = ['o', 'O', 'q', 'Q']
     ske_list = ['s', 'S']
@@ -81,6 +84,7 @@ class Object:
     def __init__(self):
         self.all_pos = []
         self.wall_pos = []
+        self.hwall_pos = []
         self.ske_pos = []
         self.ske_dead_pos = []
         self.stone_pos = []
@@ -136,6 +140,8 @@ class Object:
                     self.player_pos = [i, j]
                 if(self.all_pos[i][j] in self.wall_list):
                     self.wall_pos.append([i, j])
+                if(self.all_pos[i][j] in self.hwall_list):
+                    self.hwall_pos.append([i, j])
                 if(self.all_pos[i][j] in self.ske_list):
                     self.ske_pos.append([i, j])
                 if(self.all_pos[i][j] in self.stone_list):
@@ -281,7 +287,7 @@ class Board:
             self.screen.blit(self.sett.tutorial.render("hoặc Tường để giết", False, (255, 255, 255)), (15 * 50, 3 * 50))
             self.screen.blit(pygame.transform.scale(self.sett.ske, (75, 75)), (15 * 50, 5 * 50))
             self.screen.blit(pygame.transform.scale(self.sett.stone, (75, 75)), (18 * 50, 4 * 50))
-            self.screen.blit(pygame.transform.scale(self.sett.wall, (75, 75)), (18 * 50, 6 * 50))
+            self.screen.blit(pygame.transform.scale(self.sett.hwall, (75, 75)), (18 * 50, 6 * 50))
             self.screen.blit(self.sett.tutorial.render("Nhặt dao để chém chetme nó", False, (255, 255, 255)), (5 * 50, 7 * 50))
             self.screen.blit(pygame.transform.scale(self.sett.key, (75, 75)), (6 * 50, 8 * 50))
             self.screen.blit(pygame.transform.scale(self.sett.lock, (75, 75)), (9 * 50, 8 * 50))
@@ -369,6 +375,8 @@ class Board:
                 self.screen.blit(self.sett.stone, ((pos[1] + self.obj.col_count) * 50, (pos[0] + self.obj.row_count) * 50))
             for pos in self.obj.wall_pos:
                 self.screen.blit(self.sett.wall, ((pos[1] + self.obj.col_count) * 50, (pos[0] + self.obj.row_count) * 50))
+            for pos in self.obj.hwall_pos:
+                self.screen.blit(self.sett.hwall, ((pos[1] + self.obj.col_count) * 50, (pos[0] + self.obj.row_count) * 50))
             for pos in self.obj.goal_pos:
                 self.screen.blit(self.sett.goal, ((pos[1] + self.obj.col_count) * 50, (pos[0] + self.obj.row_count) * 50))
             for pos in self.obj.ske_pos:
@@ -400,7 +408,7 @@ class Board:
             stand_spike = True
         else:
             stand_spike = False
-        if(next_move in self.obj.wall_pos):
+        if(next_move in (self.obj.wall_pos + self.obj.hwall_pos)):
             touch_wall = True
         else:
             touch_wall = False
@@ -455,7 +463,7 @@ class Board:
                 stone_count += 1
                 if(next_move == pos):
                     next_stone = [pos[0] + dir[1], pos[1] + dir[0]]
-                    if(next_stone not in (self.obj.wall_pos + self.obj.stone_pos + self.obj.ske_pos + self.obj.lock_pos + self.obj.goal_pos)):
+                    if(next_stone not in (self.obj.wall_pos + self.obj.hwall_pos + self.obj.stone_pos + self.obj.ske_pos + self.obj.lock_pos + self.obj.goal_pos)):
                         self.next_stone_pos = stone_count
                         self.next_stone_loc = next_stone
                         self.check_stone = True
@@ -477,7 +485,7 @@ class Board:
                     if(next_ske in self.obj.goal_pos):
                         ""
                     else:
-                        if(next_ske not in (self.obj.wall_pos + self.obj.stone_pos + self.obj.ske_pos + self.obj.lock_pos)):
+                        if(next_ske not in (self.obj.wall_pos + self.obj.hwall_pos + self.obj.stone_pos + self.obj.ske_pos + self.obj.lock_pos)):
                             if((next_ske in  self.obj.spike_pos) or ((next_ske in self.obj.holea_pos) and (self.obj.popup == True)) or ((next_ske in self.obj.holeb_pos) and (self.obj.popup == False))):
                                 self.ske_dead_idx = 1
                                 self.obj.ske_dead_pos.append(next_ske)
