@@ -41,9 +41,9 @@ class Settings:
         self.lock = pygame.transform.scale(self.lock, (50, 50))
         self.unlock = pygame.image.load('assets/objects/lock/unlock.png')
         self.unlock = pygame.transform.scale(self.unlock, (50, 50))
-        self.holea = pygame.image.load('assets/objects/spike/spike_1.png')
+        self.holea = pygame.image.load('assets/objects/spike/spike_4.png')
         self.holea = pygame.transform.scale(self.holea, (50, 50))
-        self.holeb = pygame.image.load('assets/objects/spike/spike_4.png')
+        self.holeb = pygame.image.load('assets/objects/spike/spike_1.png')
         self.holeb = pygame.transform.scale(self.holeb, (50, 50))
         self.sfx_spike = pygame.image.load('assets/objects/sfx/spike_1.png')
         self.sfx_spike = pygame.transform.scale(self.sfx_spike, (50, 50))
@@ -235,7 +235,7 @@ class Board:
             self.holea_idx_int = int(self.holea_idx)
             self.sett.holea = pygame.image.load(f'assets/objects/spike/spike_{self.holea_idx_int}.png')
             self.sett.holea = pygame.transform.scale(self.sett.holea, (50, 50))
-            if(self.holea_idx >= 4.5):
+            if(self.holea_idx >= 4.74):
                 self.holea_idx = 1
                 self.holea_popup = False
         if(self.holeb_popup):
@@ -243,7 +243,7 @@ class Board:
             self.holeb_idx_int = int(self.holeb_idx)
             self.sett.holeb = pygame.image.load(f'assets/objects/spike/spike_{self.holeb_idx_int}.png')
             self.sett.holeb = pygame.transform.scale(self.sett.holeb, (50, 50))
-            if(self.holeb_idx <= 1.5):
+            if(self.holeb_idx <= 1.26):
                 self.holeb_idx = 4.75
                 self.holeb_popup = False
                 
@@ -573,15 +573,11 @@ class Board:
             self.obj.popup = not self.obj.popup
             self.holea_popup = not self.holea_popup
             self.holeb_popup = not self.holeb_popup
-            self.holea_idx = 1
-            self.holeb_idx = 4.75
         elif(possive == 2):
             self.obj.moves -= 1
             self.obj.popup = not self.obj.popup
             self.holea_popup = not self.holea_popup
             self.holeb_popup = not self.holeb_popup
-            self.holea_idx = 1
-            self.holeb_idx = 4.75
         else:
             self.obj.moves -=1
         
