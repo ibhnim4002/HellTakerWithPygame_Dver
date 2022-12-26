@@ -254,6 +254,9 @@ class Board:
             self.player_touch_idx = 1
             self.obj.player_touch_pos.clear()
         if(self.player_touch_idx >= 16):
+            if(self.snd_touch):
+                self.sett.snd_touch.play(loops = 1)
+                self.snd_touch = False
             if(self.check_ske):
                 self.obj.ske_pos[self.next_ske_pos] = self.next_ske_loc
                 self.check_ske = False
@@ -530,16 +533,17 @@ class Board:
                         self.obj.hurt = True
                         self.sfx_spike_idx = 1
                         self.snd_hurt = True
+                    self.snd_touch = True
                     self.obj.player_touch_pos.append(self.obj.player_pos[0])
                     self.obj.player_touch_pos.append(self.obj.player_pos[1])
                     self.player_touch_idx = 1
-                    self.sett.snd_touch.play()
                     self.act(2, dir)
         elif(touch_ske):
             ske_count = -1
             for pos in self.obj.ske_pos:
                 ske_count += 1
                 if(next_move == pos):
+                    self.snd_touch = True
                     next_ske = [pos[0] + dir[1], pos[1] + dir[0]]
                     if(next_ske in self.obj.goal_pos):
                         self.obj.moves = 0
@@ -573,7 +577,6 @@ class Board:
                             self.obj.player_kill_pos.append(self.obj.player_pos[1])
                             self.player_kill_idx = 1
                             del self.obj.ske_pos[ske_count]
-                        self.sett.snd_touch.play()
                         self.act(2, dir)
                     if(stand_spike):
                         self.obj.hurt = True
