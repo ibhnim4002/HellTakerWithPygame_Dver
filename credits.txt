@@ -2,15 +2,31 @@
 Khoa Công nghệ Thông tin
 Lớp 22CLC10
 
-Helltaker: Another Version
+SUStalker: The Vô Cực Universe
 
 Giảng viên hướng dẫn:
 Thầy Vũ Quốc Hoàng
 
-Thành viên thực hiện:
-Nguyễn Hà Anh
+Coder:
 Văn Bá Đức Kiên
+Nguyễn Lê Thanh Duy
+
+Animation:
 Võ Việt Long
+
+Soundtracks:
+Võ Việt Long
+
+Scripter:
+Văn Bá Đức Kiên
+
+Powerpoint thuyết trình:
+Nguyễn Hà Anh
+
+Báo cáo cuối kì:
 Bùi Công Mậu
 Thái Hữu Thọ
+
+Credits:
 Nguyễn Lê Thanh Duy
+

@@ -68,6 +68,8 @@ class Settings:
         self.KEY_DIR = {pygame.K_RIGHT: (1, 0), pygame.K_LEFT: (-1, 0), pygame.K_UP: (0, -1), pygame.K_DOWN: (0, 1)}
         self.event_list = {1: "nghèo", 2: "rớt môn", 3: "thấy crush đi lấy chồng", 4: "điểm thấp", 5: "chia tay", 6: "thấy waifu bị dduj tắt thở"}
         self.ingame = pygame.font.Font('assets/font/CrimsonPro-VariableFont_wght.ttf', 150)
+        self.title_1 = pygame.font.Font('assets/font/CrimsonPro-VariableFont_wght.ttf', 200)
+        self.title_2 = pygame.font.Font('assets/font/CrimsonPro-VariableFont_wght.ttf', 95)
         self.minigame = pygame.font.Font('assets/font/CrimsonPro-VariableFont_wght.ttf', 100)
         self.tutorial = pygame.font.Font('assets/font/CrimsonPro-VariableFont_wght.ttf', 30)
         self.main_menu = pygame.font.Font('assets/font/CrimsonPro-VariableFont_wght.ttf', 50)
@@ -191,7 +193,7 @@ class Board:
     def __init__(self):
         self.sett = Settings()
         self.obj = Object()
-        pygame.display.set_caption("SUSUSUSUSUSUS")
+        pygame.display.set_caption("SUStalker")
         pygame.mouse.set_visible(False)
         pygame.event.set_grab(True)
         self.ske_idle_idx = 1
@@ -221,22 +223,22 @@ class Board:
         self.snd_touch = False
 
     def _sprite(self):
-        self.ske_idle_idx += 0.15
+        self.ske_idle_idx += 0.3
         self.ske_idle_idx_int = int(self.ske_idle_idx)
         self.sett.ske = pygame.image.load(f'assets/objects/skeleton/ske_idle_{self.ske_idle_idx_int}.png').convert_alpha()
         self.sett.ske = pygame.transform.scale(self.sett.ske, (50, 50))
-        if(self.ske_idle_idx >= 11.84):
+        if(self.ske_idle_idx >= 11.69):
             self.react += 1
             if(self.react < 6):
                 self.ske_idle_idx = 1
-            elif(self.ske_idle_idx >= 15.84):
+            elif(self.ske_idle_idx >= 15.69):
                 self.ske_idle_idx = 1
                 self.react = 0
-        self.ske_dead_idx += 0.24
+        self.ske_dead_idx += 0.48
         self.ske_dead_idx_int = int(self.ske_dead_idx)
         self.sett.ske_dead = pygame.image.load(f'assets/objects/skeleton/ske_dead_{self.ske_dead_idx_int}.png').convert_alpha()
         self.sett.ske_dead = pygame.transform.scale(self.sett.ske_dead, (50, 50))
-        if(self.ske_dead_idx >= 15.75):
+        if(self.ske_dead_idx >= 15.51):
             self.ske_dead_idx = 1
             self.obj.ske_dead_pos.clear()
         self.player_kill_idx += 0.8
@@ -272,35 +274,35 @@ class Board:
                 self.sfx_spike_idx = 1
                 self.obj.hurt = False
         if(self.holea_popup):
-            self.holea_idx += 0.2
+            self.holea_idx += 0.4
             self.holea_idx_int = int(self.holea_idx)
             self.sett.holea = pygame.image.load(f'assets/objects/spike/spike_{self.holea_idx_int}.png').convert_alpha()
             self.sett.holea = pygame.transform.scale(self.sett.holea, (50, 50))
-            if(self.holea_idx >= 4.79):
+            if(self.holea_idx >= 4.59):
                 self.holea_idx = 1
                 self.holea_popup = False
         if(self.holeb_popup):
-            self.holeb_idx -= 0.2
+            self.holeb_idx -= 0.4
             self.holeb_idx_int = int(self.holeb_idx)
             self.sett.holeb = pygame.image.load(f'assets/objects/spike/spike_{self.holeb_idx_int}.png').convert_alpha()
             self.sett.holeb = pygame.transform.scale(self.sett.holeb, (50, 50))
-            if(self.holeb_idx <= 1.21):
-                self.holeb_idx = 4.8
+            if(self.holeb_idx <= 1.41):
+                self.holeb_idx = 4.6
                 self.holeb_popup = False
         if(self.obj.walk):
-            self.player_walk_idx += 0.75
-            self.obj.player_walk_pos = [self.obj.player_walk_pos[0] + self.obj.player_walk_dir[1]*0.06, self.obj.player_walk_pos[1] + self.obj.player_walk_dir[0]*0.06]
+            self.player_walk_idx += 0.8
+            self.obj.player_walk_pos = [self.obj.player_walk_pos[0] + self.obj.player_walk_dir[1]*0.07, self.obj.player_walk_pos[1] + self.obj.player_walk_dir[0]*0.07]
             self.player_walk_idx_int = int(self.player_walk_idx)
             self.sett.player_walk = pygame.image.load(f'assets/objects/player/player_walk_{self.player_walk_idx_int}.png').convert_alpha()
             self.sett.player_walk = pygame.transform.scale(self.sett.player_walk, (50, 50))
-            if(self.player_walk_idx >= 12.24):
+            if(self.player_walk_idx >= 12.19):
                 self.player_walk_idx = 1
                 self.obj.player_walk_pos.clear()
                 self.obj.player_walk_dir.clear()
                 self.obj.walk = False
         if(not self.obj.walk):
             self.delay_time += 1
-            if(self.delay_time >= 10):
+            if(self.delay_time >= 5):
                 self.obj.delay = True
                 self.delay_time = 1
                 
@@ -320,9 +322,15 @@ class Board:
                 self.sett.screen.blit(self.sett.main_menu.render("Credit", False, (255, 255, 255)), (11 * 50, 8 * 50))
                 self.sett.screen.blit(self.sett.main_menu.render("Minigame Tết", False, (255, 255, 255)), (11 * 50, 9 * 50))
                 self.sett.screen.blit(self.sett.main_menu.render("Thoát", False, (255, 255, 255)), (11 * 50, 10 * 50))
-                self.sett.screen.blit(self.sett.main_menu_2.render("SPACE để chọn", False, (255, 255, 255)), (12 * 50, 12 * 50))
+                self.sett.screen.blit(self.sett.main_menu_2.render("SPACE để chọn", False, (255, 255, 255)), (11.5 * 50, 12 * 50))
                 self.sett.screen.blit(self.sett.player, (self.obj.player_pos[1] * 50, self.obj.player_pos[0] * 50))
-                self.sett.screen.blit(self.sett.ingame.render("SUSUSUSUSUSUS", False, (255, 255, 255)), (2.5 * 50, 0.5 * 50))
+                self.sett.screen.blit(self.sett.title_1.render("S", False, (255, 0, 0)), (10 * 50, 0 * 50))
+                self.sett.screen.blit(self.sett.title_2.render("Ú", False, (255, 127, 0)), (11.85 * 50, 0.75 * 50))
+                self.sett.screen.blit(self.sett.title_2.render("t", False, (255, 255, 0)), (11.85 * 50, 2 * 50))
+                self.sett.screen.blit(self.sett.title_2.render("a", False, (0, 255, 0)), (12.45 * 50, 2 * 50))
+                self.sett.screen.blit(self.sett.title_2.render("l", False, (0, 0, 255)), (13.35 * 50, 2 * 50))
+                self.sett.screen.blit(self.sett.title_2.render("k", False, (75, 0, 130)), (13.85 * 50, 2 * 50))
+                self.sett.screen.blit(self.sett.title_2.render("ẻ", False, (148, 0, 111)), (14.7 * 50, 2 * 50))
         elif(self.obj.menu == 2):
             for pos in self.sett.lvl_frame_list:
                 self.sett.screen.blit(self.sett.lvl_frame, (pos[0] * 50, pos[1] * 50))
@@ -344,14 +352,14 @@ class Board:
             self.sett.screen.blit(pygame.transform.scale(self.sett.lock, (75, 75)), (9 * 50, 8 * 50))
             self.sett.screen.blit(self.sett.tutorial.render("Cẩn thận hố gai", False, (255, 255, 255)), (15 * 50, 8 * 50))
             self.sett.screen.blit(pygame.transform.scale(self.sett.spike, (75, 75)), (16 * 50, 9 * 50))
-            self.sett.screen.blit(self.sett.main_menu_2.render("SPACE để tiếp tục", False, (255, 255, 255)), (12 * 50, 12 * 50))
+            self.sett.screen.blit(self.sett.main_menu_2.render("SPACE để tiếp tục", False, (255, 255, 255)), (11.5 * 50, 12 * 50))
         elif(self.obj.menu == 4):
             for row in self.obj.cre:
                 self.sett.screen.blit(self.sett.main_menu.render(row[2], False, (255, 255, 255)), (self.cre_list[row[0]].x, (row[1] - self.cre_run) * 50))
-            self.sett.screen.blit(self.sett.main_menu_2.render("SPACE để tiếp tục", False, (255, 255, 255)), (12 * 50, 12 * 50))
+            self.sett.screen.blit(self.sett.main_menu_2.render("SPACE để tiếp tục", False, (255, 255, 255)), (11.5 * 50, 12 * 50))
             self.cre_run += 0.02
         elif(self.obj.menu == 5):
-            self.sett.screen.blit(self.sett.main_menu_2.render("SPACE để quay lại", False, (255, 255, 255)), (12 * 50, 12 * 50))
+            self.sett.screen.blit(self.sett.main_menu_2.render("SPACE để quay lại", False, (255, 255, 255)), (11.5 * 50, 12 * 50))
             self.sett.screen.blit(self.sett.tutorial.render("Time: ", False, (255, 255, 255)), (16 * 50, 11.85 * 50))
             self.sett.screen.blit(self.sett.tutorial.render(str(self.obj.event_time_now), False, (255, 255, 255)), (17.6 * 50, 11.85 * 50))
             if(self.obj.event_lose):
@@ -405,19 +413,18 @@ class Board:
                 self.sett.screen.blit(self.sett.fsucc, (0, 0))
             else:
                 self.sett.screen.blit(self.sett.succ, (0, 0))
-            self.sett.screen.blit(self.sett.tutorial.render("SPACE để tiếp tục", False, (255, 255, 255)), (11 * 50, 11 * 50))
+            self.sett.screen.blit(self.sett.tutorial.render("SPACE để tiếp tục", False, (255, 255, 255)), (11.5 * 50, 11 * 50))
         else:
             self.sett.screen.blit(self.sett.background, (0, 0))
             self.sett.screen.blit(self.sett.hud, (0, 0))
-            self.sett.screen.blit(self.sett.main_menu_2.render("ESC để quay lại", False, (255, 255, 255)), (12 * 50, 12.5 * 50))
             if(self.obj.moves > 9):
-                self.sett.screen.blit(self.sett.ingame.render(str(self.obj.moves), False, (255, 255, 255)), (1.3 * 50, 9 * 50))
+                self.sett.screen.blit(self.sett.ingame.render(str(self.obj.moves), False, (255, 255, 255)), (1.3 * 50, 9.5 * 50))
             else:
-                self.sett.screen.blit(self.sett.ingame.render(str(self.obj.moves), False, (255, 255, 255)), (2 * 50, 9 * 50))
+                self.sett.screen.blit(self.sett.ingame.render(str(self.obj.moves), False, (255, 255, 255)), (2 * 50, 9.5 * 50))
             if(self.obj.level < 10):
-                self.sett.screen.blit(self.sett.ingame.render(str(self.obj.level), False, (255, 255, 255)), (22.5 * 50, 9 * 50))
+                self.sett.screen.blit(self.sett.ingame.render(str(self.obj.level), False, (255, 255, 255)), (23 * 50, 9.5 * 50))
             else:
-                self.sett.screen.blit(self.sett.ingame.render(str(self.obj.level), False, (255, 255, 255)), (22 * 50, 9 * 50))
+                self.sett.screen.blit(self.sett.ingame.render(str(self.obj.level), False, (255, 255, 255)), (22.5 * 50, 9.5 * 50))
             for pos in self.obj.spike_pos:
                 self.sett.screen.blit(self.sett.spike, ((pos[1] + self.obj.col_count) * 50, (pos[0] + self.obj.row_count) * 50))
             if(self.obj.popup):
@@ -776,9 +783,12 @@ class Board:
                                 pygame.mixer.stop()
                                 pygame.mixer.music.load('assets/soundtracks/menu.mp3')
                                 pygame.mixer.music.play(loops = -1, fade_ms = 3000)
+                                self.obj.menu = 5
                             self.obj.level += 1
                             self.ske_idle_idx = 1
                             self.obj.__init__()
+                            if(self.obj.level == 0):
+                                self.obj.menu = 4 
             if(self.obj.level == 0):
                 self._draw_main_menu()
             else:
