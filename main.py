@@ -11,7 +11,7 @@ class Settings:
         self.width = 1300
         self.height = 700
         self.screen = pygame.display.set_mode((self.width, self.height))
-        self.background = pygame.image.load('assets/backgrounds/background.jpg').convert_alpha()
+        self.background = pygame.image.load('assets/backgrounds/background.png').convert_alpha()
         self.background = pygame.transform.scale(self.background, (self.width, self.height))
         self.loser = pygame.image.load('assets/backgrounds/loser.png').convert_alpha()
         self.loser = pygame.transform.scale(self.loser, (self.width, self.height))
@@ -21,6 +21,8 @@ class Settings:
         self.fsucc = pygame.transform.scale(self.fsucc, (self.width, self.height))
         self.secret = pygame.image.load('assets/backgrounds/secret.jpg').convert_alpha()
         self.secret = pygame.transform.scale(self.secret, (self.width, self.height))
+        self.hud = pygame.image.load('assets/backgrounds/hud.png').convert_alpha()
+        self.hud = pygame.transform.scale(self.hud, (self.width, self.height))
         self.player = pygame.image.load('assets/objects/player/player.png').convert_alpha()
         self.player = pygame.transform.scale(self.player, (50, 50))
         self.player_kill = pygame.image.load('assets/objects/player/player_kill_1.png').convert_alpha()
@@ -406,6 +408,7 @@ class Board:
             self.sett.screen.blit(self.sett.tutorial.render("SPACE để tiếp tục", False, (255, 255, 255)), (11 * 50, 11 * 50))
         else:
             self.sett.screen.blit(self.sett.background, (0, 0))
+            self.sett.screen.blit(self.sett.hud, (0, 0))
             self.sett.screen.blit(self.sett.main_menu_2.render("ESC để quay lại", False, (255, 255, 255)), (12 * 50, 12.5 * 50))
             if(self.obj.moves > 9):
                 self.sett.screen.blit(self.sett.ingame.render(str(self.obj.moves), False, (255, 255, 255)), (1.3 * 50, 9 * 50))
