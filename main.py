@@ -19,6 +19,8 @@ class Settings:
         self.succ = pygame.transform.scale(self.succ, (self.width, self.height))
         self.fsucc = pygame.image.load('assets/backgrounds/final_success.png').convert_alpha()
         self.fsucc = pygame.transform.scale(self.fsucc, (self.width, self.height))
+        self.secret = pygame.image.load('assets/backgrounds/secret.jpg').convert_alpha()
+        self.secret = pygame.transform.scale(self.secret, (self.width, self.height))
         self.player = pygame.image.load('assets/objects/player/player.png').convert_alpha()
         self.player = pygame.transform.scale(self.player, (50, 50))
         self.player_kill = pygame.image.load('assets/objects/player/player_kill_1.png').convert_alpha()
@@ -68,8 +70,12 @@ class Settings:
         self.tutorial = pygame.font.Font('assets/font/CrimsonPro-VariableFont_wght.ttf', 30)
         self.main_menu = pygame.font.Font('assets/font/CrimsonPro-VariableFont_wght.ttf', 50)
         self.main_menu_2 = pygame.font.Font('assets/font/CrimsonPro-VariableFont_wght.ttf', 20)
-        pygame.mixer.music.load('assets/music/minigame.mp3')
-        
+        pygame.mixer.music.load('assets/soundtracks/menu.mp3')
+        pygame.mixer.music.play(loops = -1, fade_ms = 3000)
+        self.snd_hurt = pygame.mixer.Sound('assets/soundtracks/hurt.mp3')
+        self.snd_touch = pygame.mixer.Sound('assets/soundtracks/touch.mp3')
+        self.snd_lvlup = pygame.mixer.Sound('assets/soundtracks/lvlup.mp3')
+        self.snd_bad = pygame.mixer.Sound('assets/soundtracks/bad_end.mp3')
 
 class Object:
     wall_list = ['#']
@@ -125,6 +131,8 @@ class Object:
         self.event_time_old = 0
         self.quit = False
         self.levelup = False
+        self.delay = True
+        self.secret = False
         #self.reso = 3
         if(self.level == 9):
             self.level = 0
@@ -206,6 +214,9 @@ class Board:
         for row in self.obj.cre:
             self.cre_list.append(self.sett.main_menu.render(row[2], False, (255, 255, 255)).get_rect(center = (650, 350)))
         self.cre_run = 0
+        self.delay_time = 1
+        self.snd_hurt = False
+        self.snd_touch = False
 
     def _sprite(self):
         self.ske_idle_idx += 0.15
@@ -248,11 +259,14 @@ class Board:
                 self.obj.stone_pos[self.next_stone_pos] = self.next_stone_loc
                 self.check_stone = False
         if(not self.obj.walk):
-            self.sfx_spike_idx += 0.25
+            self.sfx_spike_idx += 0.8
             self.sfx_spike_idx_int = int(self.sfx_spike_idx)
             self.sett.sfx_spike = pygame.image.load(f'assets/objects/sfx/spike_{self.sfx_spike_idx_int}.png').convert_alpha()
             self.sett.sfx_spike = pygame.transform.scale(self.sett.sfx_spike, (50, 50))
-            if(self.sfx_spike_idx >= 8.74):
+            if(self.snd_hurt):
+                self.sett.snd_hurt.play()
+                self.snd_hurt = False
+            if(self.sfx_spike_idx >= 8.19):
                 self.sfx_spike_idx = 1
                 self.obj.hurt = False
         if(self.holea_popup):
@@ -282,6 +296,11 @@ class Board:
                 self.obj.player_walk_pos.clear()
                 self.obj.player_walk_dir.clear()
                 self.obj.walk = False
+        if(not self.obj.walk):
+            self.delay_time += 1
+            if(self.delay_time >= 10):
+                self.obj.delay = True
+                self.delay_time = 1
                 
     def _draw_main_menu(self):
         self.sett.screen.blit(self.sett.background, (0, 0))
@@ -318,7 +337,7 @@ class Board:
             self.sett.screen.blit(pygame.transform.scale(self.sett.ske, (75, 75)), (15 * 50, 5 * 50))
             self.sett.screen.blit(pygame.transform.scale(self.sett.stone, (75, 75)), (18 * 50, 4 * 50))
             self.sett.screen.blit(pygame.transform.scale(self.sett.hwall, (75, 75)), (18 * 50, 6 * 50))
-            self.sett.screen.blit(self.sett.tutorial.render("Nhặt dao để chém chetme nó", False, (255, 255, 255)), (5 * 50, 7 * 50))
+            self.sett.screen.blit(self.sett.tutorial.render("Nhặt dao để chém ch*tm* nó", False, (255, 255, 255)), (5 * 50, 7 * 50))
             self.sett.screen.blit(pygame.transform.scale(self.sett.key, (75, 75)), (6 * 50, 8 * 50))
             self.sett.screen.blit(pygame.transform.scale(self.sett.lock, (75, 75)), (9 * 50, 8 * 50))
             self.sett.screen.blit(self.sett.tutorial.render("Cẩn thận hố gai", False, (255, 255, 255)), (15 * 50, 8 * 50))
@@ -373,8 +392,12 @@ class Board:
                 
     def _draw_board(self):
         if(self.obj.moves <= 0):
-            self.sett.screen.blit(self.sett.loser, (0, 0))
-            self.sett.screen.blit(self.sett.tutorial.render("R để chơi lại", False, (255, 255, 255)), (11.5 * 50, 11 * 50))
+            if(self.obj.secret):
+                self.sett.screen.blit(self.sett.secret, (0, 0))
+                self.sett.screen.blit(self.sett.tutorial.render("R để chơi lại", False, (255, 255, 255)), (11.5 * 50, 11 * 50))
+            else:
+                self.sett.screen.blit(self.sett.loser, (0, 0))
+                self.sett.screen.blit(self.sett.tutorial.render("R để chơi lại", False, (255, 255, 255)), (11.5 * 50, 11 * 50))
         elif(self.obj.levelup):
             if(self.obj.level == 8):
                 self.sett.screen.blit(self.sett.fsucc, (0, 0))
@@ -433,7 +456,7 @@ class Board:
                 self.sett.screen.blit(pygame.transform.flip(self.sett.player, self.obj.player_flip, 0), ((self.obj.player_pos[1] + self.obj.col_count) * 50, (self.obj.player_pos[0] + self.obj.row_count) * 50))        
             if(self.obj.hurt and not self.obj.walk):
                 self.sett.screen.blit(pygame.transform.flip(self.sett.sfx_spike, self.obj.player_flip, 0), ((self.obj.player_pos[1] + self.obj.col_count) * 50, (self.obj.player_pos[0] + self.obj.row_count) * 50))        
-            self._sprite();
+        self._sprite();
 
     def move(self, dir):
         if(dir[0] == -1):
@@ -486,6 +509,8 @@ class Board:
                 del self.obj.ske_pos[ske_counts]
         if(touch_goal):
             self.obj.player_pos = [self.obj.player_pos[0] + dir[1], self.obj.player_pos[1] + dir[0]]
+            pygame.mixer.music.pause()
+            self.sett.snd_lvlup.play()
             self.obj.levelup = True
         elif(touch_stone):
             stone_count = -1
@@ -501,9 +526,11 @@ class Board:
                         self.act(0, dir)
                         self.obj.hurt = True
                         self.sfx_spike_idx = 1
+                        self.snd_hurt = True
                     self.obj.player_touch_pos.append(self.obj.player_pos[0])
                     self.obj.player_touch_pos.append(self.obj.player_pos[1])
                     self.player_touch_idx = 1
+                    self.sett.snd_touch.play()
                     self.act(2, dir)
         elif(touch_ske):
             ske_count = -1
@@ -512,7 +539,10 @@ class Board:
                 if(next_move == pos):
                     next_ske = [pos[0] + dir[1], pos[1] + dir[0]]
                     if(next_ske in self.obj.goal_pos):
-                        ""
+                        self.obj.moves = 0
+                        self.obj.secret = True
+                        pygame.mixer.music.pause()
+                        self.sett.snd_bad.play()
                     else:
                         if(next_ske not in (self.obj.wall_pos + self.obj.hwall_pos + self.obj.stone_pos + self.obj.ske_pos + self.obj.lock_pos)):
                             if((next_ske in  self.obj.spike_pos) or ((next_ske in self.obj.holea_pos) and (self.obj.popup == True)) or ((next_ske in self.obj.holeb_pos) and (self.obj.popup == False))):
@@ -540,9 +570,11 @@ class Board:
                             self.obj.player_kill_pos.append(self.obj.player_pos[1])
                             self.player_kill_idx = 1
                             del self.obj.ske_pos[ske_count]
+                        self.sett.snd_touch.play()
                         self.act(2, dir)
                     if(stand_spike):
                         self.obj.hurt = True
+                        self.snd_hurt = True
                         self.sfx_spike_idx = 1
                         self.act(0, dir)
         elif(touch_key):
@@ -569,6 +601,7 @@ class Board:
             self.act(1, dir)
             self.obj.hurt = True
             self.sfx_spike_idx = 1
+            self.snd_hurt = True
         elif(not touch_wall and not touch_ske_dead):
             if(self.obj.level == 0):
                 if(self.obj.quit):
@@ -611,17 +644,26 @@ class Board:
             self.obj.player_walk_dir.append(dir[1])
             self.obj.player_pos = [self.obj.player_pos[0] + dir[1], self.obj.player_pos[1] + dir[0]]
             self.obj.moves -= 1
+            self.delay_time = 1
+            self.obj.delay = False
             self.obj.walk = True
             self.obj.popup = not self.obj.popup
             self.holea_popup = not self.holea_popup
             self.holeb_popup = not self.holeb_popup
+            if(self.obj.moves <= 0):
+                pygame.mixer.music.pause()
+                self.sett.snd_bad.play()
         elif(possive == 2):
             self.obj.moves -= 1
             self.obj.popup = not self.obj.popup
             self.holea_popup = not self.holea_popup
             self.holeb_popup = not self.holeb_popup
+            if(self.obj.moves <= 0):
+                self.sett.snd_bad.play()
         else:
             self.obj.moves -=1
+            if(self.obj.moves <= 0):
+                self.sett.snd_bad.play()
         
     
     def run(self):
@@ -641,6 +683,8 @@ class Board:
                                         self.obj.level += 1
                                         with open('levels/lvl.txt', 'w') as f:
                                             f.write("1\n0\n0\n0\n0\n0\n0\n0")
+                                        pygame.mixer.music.load('assets/soundtracks/ingame.mp3')
+                                        pygame.mixer.music.play(loops = -1, fade_ms = 3000)
                                         self.obj.__init__()
                                     elif(self.obj.choose == 2):
                                         self.obj.menu = 2
@@ -655,7 +699,8 @@ class Board:
                                         pygame.mouse.set_pos(650, 350)
                                         self.event_player_rect.center = (650, 350)
                                         self.obj.event_time = pygame.time.get_ticks()
-                                        pygame.mixer.music.play(loops=-1)
+                                        pygame.mixer.music.load('assets/soundtracks/minigame.mp3')
+                                        pygame.mixer.music.play(loops = -1, fade_ms = 3000)
                                     elif(self.obj.choose == 6):
                                         self.obj.choose = 1
                                         self.obj.player_pos = [7, 9]
@@ -668,6 +713,8 @@ class Board:
                             elif(self.obj.menu == 2):
                                 if(self.obj.level_list[self.obj.lvl_choose-1]):
                                     self.obj.level = self.obj.lvl_choose
+                                    pygame.mixer.music.load('assets/soundtracks/ingame.mp3')
+                                    pygame.mixer.music.play(loops = -1, fade_ms = 3000)
                                     self.obj.__init__()
                             elif(self.obj.menu == 3):
                                 self.obj.menu = 1
@@ -678,23 +725,33 @@ class Board:
                                 self.obj.choose = 1
                                 self.obj.player_pos = [self.obj.player_pos[0] - 3, self.obj.player_pos[1]]
                             elif(self.obj.menu == 5):
+                                pygame.mixer.music.load('assets/soundtracks/menu.mp3')
+                                pygame.mixer.music.play(loops = -1, fade_ms = 3000)
                                 self.obj.__init__()
-                                pygame.mixer.music.stop()
                         if event.key == pygame.K_ESCAPE:
                             if(self.obj.menu == 2):
+                                pygame.mixer.music.load('assets/soundtracks/menu.mp3')
+                                pygame.mixer.music.play(loops = -1, fade_ms = 3000)
                                 self.obj.__init__()
                     else:
-                        if((event.key in self.sett.KEY_DIR) and (not self.obj.walk) and (self.obj.player_pos != self.obj.player_kill_pos) and (self.obj.player_pos != self.obj.player_touch_pos)):
+                        if((event.key in self.sett.KEY_DIR) and self.obj.delay and (not self.obj.walk) and (self.obj.player_pos != self.obj.player_kill_pos) and (self.obj.player_pos != self.obj.player_touch_pos)):
                             if(self.obj.moves > 0):
                                 self.move(self.sett.KEY_DIR[event.key])
                         elif event.key == pygame.K_ESCAPE:
                             self.obj.level = 0
+                            pygame.mixer.music.load('assets/soundtracks/menu.mp3')
+                            pygame.mixer.music.play(loops = -1, fade_ms = 3000)
                             self.obj.__init__()
-                        elif event.key == pygame.K_r:
+                        elif ((event.key == pygame.K_r) and self.obj.delay and (not self.obj.walk) and (self.obj.player_pos != self.obj.player_kill_pos) and (self.obj.player_pos != self.obj.player_touch_pos)):
                             self.ske_idle_idx = 1
+                            pygame.mixer.stop()
+                            if(self.obj.moves <= 0):
+                                pygame.mixer.music.unpause()
                             self.obj.__init__()
                         elif event.key == pygame.K_l:
-                            self.obj.moves +=10
+                            self.obj.moves += 10
+                        elif event.key == pygame.K_e:
+                            self.obj.moves = 1
                         elif event.key == pygame.K_z:
                             self.obj.level += 1
                             self.ske_idle_idx = 1
@@ -710,6 +767,12 @@ class Board:
                                         self.obj.level_list[self.obj.level] = 1
                                         for lvl in self.obj.level_list:
                                             f.write(str(lvl) + "\n")
+                                pygame.mixer.stop()
+                                pygame.mixer.music.unpause()                               
+                            else:
+                                pygame.mixer.stop()
+                                pygame.mixer.music.load('assets/soundtracks/menu.mp3')
+                                pygame.mixer.music.play(loops = -1, fade_ms = 3000)
                             self.obj.level += 1
                             self.ske_idle_idx = 1
                             self.obj.__init__()
