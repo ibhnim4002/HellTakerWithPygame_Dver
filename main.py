@@ -66,7 +66,7 @@ class Settings:
         self.quit = pygame.transform.scale(self.quit, (900, 75))
         self.lvl_frame_list = [[6, 4, 1], [10, 4, 2], [14, 4, 3], [18,4, 4], [6, 8, 5], [10, 8, 6], [14, 8, 7], [18, 8, 8]]
         self.KEY_DIR = {pygame.K_RIGHT: (1, 0), pygame.K_LEFT: (-1, 0), pygame.K_UP: (0, -1), pygame.K_DOWN: (0, 1)}
-        self.event_list = {1: "nghèo", 2: "rớt môn", 3: "thấy crush đi lấy chồng", 4: "điểm thấp", 5: "chia tay", 6: "thấy waifu bị dduj tắt thở"}
+        self.event_list = {1: "nghèo", 2: "rớt môn", 3: "thấy crush lấy chồng", 4: "điểm thấp", 5: "chia tay", 6: "không được về quê", 7: "mất tiền"}
         self.ingame = pygame.font.Font('assets/font/CrimsonPro-VariableFont_wght.ttf', 150)
         self.title_1 = pygame.font.Font('assets/font/CrimsonPro-VariableFont_wght.ttf', 200)
         self.title_2 = pygame.font.Font('assets/font/CrimsonPro-VariableFont_wght.ttf', 95)
@@ -317,13 +317,9 @@ class Board:
                 self.sett.screen.blit(self.sett.main_menu.render("Thoát", False, (255, 255, 255)), (11 * 50, 10 * 50))
                 self.sett.screen.blit(self.sett.main_menu_2.render("SPACE để chọn", False, (255, 255, 255)), (11.5 * 50, 12 * 50))
                 self.sett.screen.blit(self.sett.player, (self.obj.player_pos[1] * 50, self.obj.player_pos[0] * 50))
-                self.sett.screen.blit(self.sett.title_1.render("S", False, (255, 0, 0)), (10 * 50, 0 * 50))
-                self.sett.screen.blit(self.sett.title_2.render("Ú", False, (255, 127, 0)), (11.85 * 50, 0.75 * 50))
-                self.sett.screen.blit(self.sett.title_2.render("t", False, (255, 255, 0)), (11.85 * 50, 2 * 50))
-                self.sett.screen.blit(self.sett.title_2.render("a", False, (0, 255, 0)), (12.45 * 50, 2 * 50))
-                self.sett.screen.blit(self.sett.title_2.render("l", False, (0, 0, 255)), (13.35 * 50, 2 * 50))
-                self.sett.screen.blit(self.sett.title_2.render("k", False, (75, 0, 130)), (13.85 * 50, 2 * 50))
-                self.sett.screen.blit(self.sett.title_2.render("ẻ", False, (148, 0, 111)), (14.7 * 50, 2 * 50))
+                self.sett.screen.blit(self.sett.title_1.render("S", False, (220, 220, 220)), (10 * 50, 0 * 50))
+                self.sett.screen.blit(self.sett.title_2.render("Ú", False, (220, 220, 220)), (11.85 * 50, 0.75 * 50))
+                self.sett.screen.blit(self.sett.title_2.render("talkẻ", False, (220, 220, 220)), (11.85 * 50, 2 * 50))
         elif(self.obj.menu == 2):
             for pos in self.sett.lvl_frame_list:
                 self.sett.screen.blit(self.sett.lvl_frame, (pos[0] * 50, pos[1] * 50))
@@ -384,7 +380,7 @@ class Board:
     def event(self):
         for i in range (0, random.randint(1, int(self.obj.event_spawn)+3)):
             self.spawn = [random.randint(-120, 1420), random.randint(-120, 820)]
-            event = random.randint(1, 6)
+            event = random.randint(1, 7)
             new_spawn = self.sett.main_menu_2.render(f"{self.sett.event_list[event]}", False, (255, 255, 255)).get_rect(topleft = self.spawn)
             if(math.dist(new_spawn.center, self.event_player_rect.center) > 400):
                 self.obj.event_pos.append([new_spawn, event])
