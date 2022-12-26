@@ -135,7 +135,6 @@ class Object:
         self.event_time_old = 0
         self.quit = False
         self.levelup = False
-        self.delay = True
         self.secret = False
         #self.reso = 3
         if(self.level == 9):
@@ -218,7 +217,6 @@ class Board:
         for row in self.obj.cre:
             self.cre_list.append(self.sett.main_menu.render(row[2], False, (255, 255, 255)).get_rect(center = (650, 350)))
         self.cre_run = 0
-        self.delay_time = 1
         self.snd_hurt = False
         self.snd_touch = False
 
@@ -300,11 +298,6 @@ class Board:
                 self.obj.player_walk_pos.clear()
                 self.obj.player_walk_dir.clear()
                 self.obj.walk = False
-        if(not self.obj.walk):
-            self.delay_time += 1
-            if(self.delay_time >= 5):
-                self.obj.delay = True
-                self.delay_time = 1
                 
     def _draw_main_menu(self):
         self.sett.screen.blit(self.sett.background, (0, 0))
@@ -654,8 +647,6 @@ class Board:
             self.obj.player_walk_dir.append(dir[1])
             self.obj.player_pos = [self.obj.player_pos[0] + dir[1], self.obj.player_pos[1] + dir[0]]
             self.obj.moves -= 1
-            self.delay_time = 1
-            self.obj.delay = False
             self.obj.walk = True
             self.obj.popup = not self.obj.popup
             self.holea_popup = not self.holea_popup
@@ -744,7 +735,7 @@ class Board:
                                 pygame.mixer.music.play(loops = -1, fade_ms = 3000)
                                 self.obj.__init__()
                     else:
-                        if((event.key in self.sett.KEY_DIR) and self.obj.delay and (not self.obj.walk) and (self.obj.player_pos != self.obj.player_kill_pos) and (self.obj.player_pos != self.obj.player_touch_pos)):
+                        if((event.key in self.sett.KEY_DIR) and (not self.obj.hurt) and (not self.obj.walk) and (self.obj.player_pos != self.obj.player_kill_pos) and (self.obj.player_pos != self.obj.player_touch_pos)):
                             if(self.obj.moves > 0):
                                 self.move(self.sett.KEY_DIR[event.key])
                         elif event.key == pygame.K_ESCAPE:
@@ -752,7 +743,7 @@ class Board:
                             pygame.mixer.music.load('assets/soundtracks/menu.mp3')
                             pygame.mixer.music.play(loops = -1, fade_ms = 3000)
                             self.obj.__init__()
-                        elif ((event.key == pygame.K_r) and self.obj.delay and (not self.obj.walk) and (self.obj.player_pos != self.obj.player_kill_pos) and (self.obj.player_pos != self.obj.player_touch_pos)):
+                        elif ((event.key == pygame.K_r) and (not self.obj.hurt) and (not self.obj.walk) and (self.obj.player_pos != self.obj.player_kill_pos) and (self.obj.player_pos != self.obj.player_touch_pos)):
                             self.ske_idle_idx = 1
                             pygame.mixer.stop()
                             if(self.obj.moves <= 0):
