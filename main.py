@@ -336,7 +336,7 @@ class Board:
             self.sett.screen.blit(pygame.transform.scale(self.sett.ske, (75, 75)), (15 * 50, 5 * 50))
             self.sett.screen.blit(pygame.transform.scale(self.sett.stone, (75, 75)), (18 * 50, 4 * 50))
             self.sett.screen.blit(pygame.transform.scale(self.sett.hwall, (75, 75)), (18 * 50, 6 * 50))
-            self.sett.screen.blit(self.sett.tutorial.render("Nhặt dao để chém ch*tm* nó", False, (192, 192, 192)), (5 * 50, 7 * 50))
+            self.sett.screen.blit(self.sett.tutorial.render("Nhặt dao để chém ch**m* nó", False, (192, 192, 192)), (5 * 50, 7 * 50))
             self.sett.screen.blit(pygame.transform.scale(self.sett.key, (75, 75)), (6 * 50, 8 * 50))
             self.sett.screen.blit(pygame.transform.scale(self.sett.lock, (75, 75)), (9 * 50, 8 * 50))
             self.sett.screen.blit(self.sett.tutorial.render("Cẩn thận hố gai", False, (192, 192, 192)), (15 * 50, 8 * 50))
