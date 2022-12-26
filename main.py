@@ -512,7 +512,8 @@ class Board:
         if(touch_goal):
             self.obj.player_pos = [self.obj.player_pos[0] + dir[1], self.obj.player_pos[1] + dir[0]]
             pygame.mixer.music.pause()
-            self.sett.snd_lvlup.play()
+            if(self.obj.level != 8):
+                self.sett.snd_lvlup.play()
             self.obj.levelup = True
         elif(touch_stone):
             stone_count = -1
@@ -776,7 +777,8 @@ class Board:
                             self.ske_idle_idx = 1
                             self.obj.__init__()
                             if(self.obj.level == 0):
-                                self.obj.menu = 4 
+                                self.obj.menu = 4
+                                self.obj.player_pos = [self.obj.player_pos[0] + 3, self.obj.player_pos[1]]
             if(self.obj.level == 0):
                 self._draw_main_menu()
             else:
