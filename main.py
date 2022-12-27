@@ -25,6 +25,8 @@ class Settings:
         self.hud = pygame.transform.scale(self.hud, (self.width, self.height))
         self.cutscenes = pygame.image.load('assets/cutscenes/cutscenes_0.png').convert_alpha()
         self.cutscenes = pygame.transform.scale(self.cutscenes, (self.width, self.height))
+        self.box = pygame.image.load('assets/backgrounds/dialog_box.png').convert_alpha()
+        self.box = pygame.transform.scale(self.cutscenes, (self.width, 300))
         self.player = pygame.image.load('assets/objects/player/player.png').convert_alpha()
         self.player = pygame.transform.scale(self.player, (50, 50))
         self.player_kill = pygame.image.load('assets/objects/player/player_kill_1.png').convert_alpha()
@@ -451,6 +453,7 @@ class Board:
         elif(self.obj.final):
             self.sett.screen.blit(self.sett.background, (0, 0))
             self.sett.screen.blit(self.sett.cutscenes, (400, 200))
+            self.sett.screen.blit(self.sett.cutscenes, (0, 400))
             self.sett.screen.blit(self.sett.tutorial.render(str(self.obj.fscript_0[self.obj.final_score]), False, (192, 192, 192)), (5 * 50, 6 * 50))
             self.sett.screen.blit(self.sett.tutorial.render(str(self.obj.fscript_1[self.obj.final_score]), False, (192, 192, 192)), (5 * 50, 8 * 50))
             self.sett.screen.blit(self.sett.tutorial.render(str(self.obj.fscript_2[self.obj.final_score]), False, (192, 192, 192)), (5 * 50, 10 * 50))
@@ -568,8 +571,8 @@ class Board:
                     self.sett.snd_kill.play()
             if(touch_goal):
                 self.obj.player_pos = [self.obj.player_pos[0] + dir[1], self.obj.player_pos[1] + dir[0]]
+                pygame.mixer.music.pause()
                 if(self.obj.level != 8):
-                    pygame.mixer.music.pause()
                     self.sett.snd_lvlup.play()
                     self.obj.levelup = True
                 else:
