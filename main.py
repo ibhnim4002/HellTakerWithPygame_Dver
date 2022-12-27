@@ -17,12 +17,14 @@ class Settings:
         self.loser = pygame.transform.scale(self.loser, (self.width, self.height))
         self.succ = pygame.image.load('assets/backgrounds/success.png').convert_alpha()
         self.succ = pygame.transform.scale(self.succ, (self.width, self.height))
-        self.fsucc = pygame.image.load('assets/backgrounds/final_success.png').convert_alpha()
-        self.fsucc = pygame.transform.scale(self.fsucc, (self.width, self.height))
+        self.ending = pygame.image.load('assets/backgrounds/ending_8.png').convert_alpha()
+        self.ending = pygame.transform.scale(self.ending, (self.width, self.height))
         self.secret = pygame.image.load('assets/backgrounds/secret.jpg').convert_alpha()
         self.secret = pygame.transform.scale(self.secret, (self.width, self.height))
         self.hud = pygame.image.load('assets/backgrounds/hud.png').convert_alpha()
         self.hud = pygame.transform.scale(self.hud, (self.width, self.height))
+        self.cutscenes = pygame.image.load('assets/cutscenes/cutscenes_0.png').convert_alpha()
+        self.cutscenes = pygame.transform.scale(self.cutscenes, (self.width, self.height))
         self.player = pygame.image.load('assets/objects/player/player.png').convert_alpha()
         self.player = pygame.transform.scale(self.player, (50, 50))
         self.player_kill = pygame.image.load('assets/objects/player/player_kill_1.png').convert_alpha()
@@ -80,6 +82,9 @@ class Settings:
         self.snd_touch = pygame.mixer.Sound('assets/soundtracks/touch.mp3')
         self.snd_lvlup = pygame.mixer.Sound('assets/soundtracks/lvlup.mp3')
         self.snd_bad = pygame.mixer.Sound('assets/soundtracks/bad_end.mp3')
+        self.snd_true = pygame.mixer.Sound('assets/soundtracks/true_end.mp3')
+        self.snd_nut = pygame.mixer.Sound('assets/soundtracks/cracked_nut_end.mp3')
+        self.snd_kill = pygame.mixer.Sound('assets/soundtracks/kill.mp3')
 
 class Object:
     wall_list = ['#']
@@ -136,11 +141,38 @@ class Object:
         self.quit = False
         self.levelup = False
         self.secret = False
-        #self.reso = 3
+        self.final = False
+        self.cutscenes = 0
+        self.final_choose = 1
+        self.final_score = 0
+        self.fchoose_1 = []
+        self.fchoose_2 = []
+        self.fscript_0 = []
+        self.fscript_1 = []
+        self.fscript_2 = []
+        self.ending = []
+        self.change = False
         if(self.level == 9):
             self.level = 0
         if(self.level > 10):
             self.level = 1
+        with open('assets/ending.txt', 'r', encoding = 'utf-8-sig') as f:
+            self.cutscenes = int(f.readline())
+            for i in range (0, self.cutscenes):
+                self.fscript_0.append(str(f.readline()))
+                self.fscript_0[i] = self.fscript_0[i][0:len(self.fscript_0[i])-1]
+            for i in range (0, self.cutscenes):
+                self.fscript_1.append(f.readline())
+                self.fscript_1[i] = self.fscript_1[i][0:len(self.fscript_1[i])-1]
+            for i in range (0, self.cutscenes):
+                self.fchoose_1.append(int(f.readline()))
+            for i in range (0, self.cutscenes):
+                self.fscript_2.append(f.readline())
+                self.fscript_2[i] = self.fscript_2[i][0:len(self.fscript_2[i])-1]
+            for i in range (0, self.cutscenes):
+                self.fchoose_2.append(int(f.readline()))
+            for row in f.read().splitlines():
+                self.ending.append(int(row))
         with open('levels/lvl.txt', 'r') as f:
             for row in f.read().splitlines():
                 self.level_list.append(int(row))
@@ -157,6 +189,7 @@ class Object:
                 self.all_pos.append(list(row))
             self.row_count = len(self.all_pos)
             self.col_count = 0
+        print(self.fchoose_1, self.fchoose_2)
         for i in range (0, len(self.all_pos)):
             self.in_col_count = 0
             for j in range (0, len(self.all_pos[i])):
@@ -301,6 +334,10 @@ class Board:
                 self.obj.player_walk_pos.clear()
                 self.obj.player_walk_dir.clear()
                 self.obj.walk = False
+        if(self.obj.change):
+            self.sett.cutscenes = pygame.image.load(f'assets/cutscenes/cutscenes_{self.obj.final_score}.png').convert_alpha()
+            self.sett.cutscenes = pygame.transform.scale(self.sett.cutscenes, (150, 150))
+            self.obj.change = False
                 
     def _draw_main_menu(self):
         self.sett.screen.blit(self.sett.background, (0, 0))
@@ -334,8 +371,8 @@ class Board:
         elif(self.obj.menu == 3):
             self.sett.screen.blit(self.sett.tutorial.render("Giải cứu sú pónk để qua màn", False, (192, 192, 192)), (5 * 50, 2 * 50))
             self.sett.screen.blit(pygame.transform.scale(self.sett.goal, (100, 100)), (7 * 50, 3.5 * 50))
-            self.sett.screen.blit(self.sett.tutorial.render("Đẩy Người Xương vào Đá", False, (192, 192, 192)), (15 * 50, 2 * 50))
-            self.sett.screen.blit(self.sett.tutorial.render("hoặc Tường để giết", False, (192, 192, 192)), (15 * 50, 3 * 50))
+            self.sett.screen.blit(self.sett.tutorial.render("Dồn Người Xương vào Đá", False, (192, 192, 192)), (15 * 50, 2 * 50))
+            self.sett.screen.blit(self.sett.tutorial.render("hoặc Tường để tiêu diệt", False, (192, 192, 192)), (15 * 50, 3 * 50))
             self.sett.screen.blit(pygame.transform.scale(self.sett.ske, (75, 75)), (15 * 50, 5 * 50))
             self.sett.screen.blit(pygame.transform.scale(self.sett.stone, (75, 75)), (18 * 50, 4 * 50))
             self.sett.screen.blit(pygame.transform.scale(self.sett.hwall, (75, 75)), (18 * 50, 6 * 50))
@@ -405,10 +442,19 @@ class Board:
                 self.sett.screen.blit(self.sett.tutorial.render("R để chơi lại", False, (192, 192, 192)), (11.5 * 50, 11 * 50))
         elif(self.obj.levelup):
             if(self.obj.level == 8):
-                self.sett.screen.blit(self.sett.fsucc, (0, 0))
+                for end in self.obj.ending:
+                    if(self.obj.final_score == end):
+                        self.sett.screen.blit(pygame.transform.scale(pygame.image.load(f'assets/backgrounds/ending_{end}.png').convert_alpha(), (self.sett.width, self.sett.height)), (0, 0))
             else:
                 self.sett.screen.blit(self.sett.succ, (0, 0))
             self.sett.screen.blit(self.sett.tutorial.render("SPACE để tiếp tục", False, (192, 192, 192)), (11.5 * 50, 11 * 50))
+        elif(self.obj.final):
+            self.sett.screen.blit(self.sett.background, (0, 0))
+            self.sett.screen.blit(self.sett.cutscenes, (400, 200))
+            self.sett.screen.blit(self.sett.tutorial.render(str(self.obj.fscript_0[self.obj.final_score]), False, (192, 192, 192)), (5 * 50, 6 * 50))
+            self.sett.screen.blit(self.sett.tutorial.render(str(self.obj.fscript_1[self.obj.final_score]), False, (192, 192, 192)), (5 * 50, 8 * 50))
+            self.sett.screen.blit(self.sett.tutorial.render(str(self.obj.fscript_2[self.obj.final_score]), False, (192, 192, 192)), (5 * 50, 10 * 50))
+            self.sett.screen.blit(self.sett.player, (self.obj.player_pos[1] * 50, self.obj.player_pos[0] * 50))       
         else:
             self.sett.screen.blit(self.sett.background, (0, 0))
             self.sett.screen.blit(self.sett.hud, (0, 0))
@@ -464,184 +510,193 @@ class Board:
         self._sprite();
 
     def move(self, dir):
-        if(dir[0] == -1):
-            self.obj.player_flip = True
-        elif(dir[0] == 1):
-            self.obj.player_flip = False
-        next_move = [self.obj.player_pos[0] + dir[1], self.obj.player_pos[1] + dir[0]]
-        if((self.obj.player_pos in self.obj.spike_pos) or ((self.obj.player_pos in self.obj.holea_pos) and (self.obj.popup == True)) or ((self.obj.player_pos in self.obj.holeb_pos) and (self.obj.popup == False))):
-            stand_spike = True
+        if self.obj.final:
+            if(dir[1] != 0):
+                if(self.obj.fchoose_2[self.obj.final_score]):
+                    if((self.obj.final_choose + dir[1]) in range(1, 3)):
+                        self.obj.player_pos = [self.obj.player_pos[0] + dir[1]*2, self.obj.player_pos[1]]
+                        self.obj.final_choose += dir[1]
         else:
-            stand_spike = False
-        if(next_move in (self.obj.wall_pos + self.obj.hwall_pos)):
-            touch_wall = True
-        else:
-            touch_wall = False
-        if(next_move in self.obj.stone_pos):
-            touch_stone = True
-        else:
-            touch_stone = False
-        if(next_move in self.obj.ske_pos):
-            touch_ske = True
-        else:
-            touch_ske = False
-        if(next_move in self.obj.ske_dead_pos):
-            touch_ske_dead = True
-        else:
-            touch_ske_dead = False
-        if(next_move in self.obj.key_pos):
-            touch_key = True
-        else:
-            touch_key = False
-        if((next_move in self.obj.lock_pos) and (self.obj.unlock == False)):
-            touch_lock = True
-        else:
-            touch_lock = False
-        if((next_move in self.obj.spike_pos) or ((next_move in self.obj.holea_pos) and (self.obj.popup == True)) or ((next_move in self.obj.holeb_pos) and (self.obj.popup == False))):
-            touch_spike = True
-        else:
-            touch_spike = False
-        if(next_move in self.obj.goal_pos):
-            touch_goal = True
-        else:
-            touch_goal = False
-        ske_counts = -1
-        for pos in self.obj.ske_pos:
-            ske_counts += 1
-            if(((pos in self.obj.holea_pos) and (self.obj.popup == True)) or ((pos in self.obj.holeb_pos) and (self.obj.popup == False))):
-                self.ske_dead_idx = 1
-                self.obj.ske_dead_pos.append(self.obj.ske_pos[ske_counts])
-                del self.obj.ske_pos[ske_counts]
-        if(touch_goal):
-            self.obj.player_pos = [self.obj.player_pos[0] + dir[1], self.obj.player_pos[1] + dir[0]]
-            pygame.mixer.music.pause()
-            if(self.obj.level != 8):
-                self.sett.snd_lvlup.play()
-            self.obj.levelup = True
-        elif(touch_stone):
-            stone_count = -1
-            for pos in self.obj.stone_pos:
-                stone_count += 1
-                if(next_move == pos):
-                    next_stone = [pos[0] + dir[1], pos[1] + dir[0]]
-                    if(next_stone not in (self.obj.wall_pos + self.obj.hwall_pos + self.obj.stone_pos + self.obj.ske_pos + self.obj.lock_pos + self.obj.goal_pos)):
-                        self.next_stone_pos = stone_count
-                        self.next_stone_loc = next_stone
-                        self.check_stone = True
-                    if(stand_spike):
-                        self.act(0, dir)
-                        self.obj.hurt = True
-                        self.sfx_spike_idx = 1
-                        self.snd_hurt = True
-                    self.snd_touch = True
-                    self.obj.player_touch_pos.append(self.obj.player_pos[0])
-                    self.obj.player_touch_pos.append(self.obj.player_pos[1])
-                    self.player_touch_idx = 1
-                    self.act(2, dir)
-        elif(touch_ske):
-            ske_count = -1
+            if(dir[0] == -1):
+                self.obj.player_flip = True
+            elif(dir[0] == 1):
+                self.obj.player_flip = False
+            next_move = [self.obj.player_pos[0] + dir[1], self.obj.player_pos[1] + dir[0]]
+            if((self.obj.player_pos in self.obj.spike_pos) or ((self.obj.player_pos in self.obj.holea_pos) and (self.obj.popup == True)) or ((self.obj.player_pos in self.obj.holeb_pos) and (self.obj.popup == False))):
+                stand_spike = True
+            else:
+                stand_spike = False
+            if(next_move in (self.obj.wall_pos + self.obj.hwall_pos)):
+                touch_wall = True
+            else:
+                touch_wall = False
+            if(next_move in self.obj.stone_pos):
+                touch_stone = True
+            else:
+                touch_stone = False
+            if(next_move in self.obj.ske_pos):
+                touch_ske = True
+            else:
+                touch_ske = False
+            if(next_move in self.obj.ske_dead_pos):
+                touch_ske_dead = True
+            else:
+                touch_ske_dead = False
+            if(next_move in self.obj.key_pos):
+                touch_key = True
+            else:
+                touch_key = False
+            if((next_move in self.obj.lock_pos) and (self.obj.unlock == False)):
+                touch_lock = True
+            else:
+                touch_lock = False
+            if((next_move in self.obj.spike_pos) or ((next_move in self.obj.holea_pos) and (self.obj.popup == True)) or ((next_move in self.obj.holeb_pos) and (self.obj.popup == False))):
+                touch_spike = True
+            else:
+                touch_spike = False
+            if(next_move in self.obj.goal_pos):
+                touch_goal = True
+            else:
+                touch_goal = False
+            ske_counts = -1
             for pos in self.obj.ske_pos:
-                ske_count += 1
-                if(next_move == pos):
-                    self.snd_touch = True
-                    next_ske = [pos[0] + dir[1], pos[1] + dir[0]]
-                    if(next_ske in self.obj.goal_pos):
-                        self.obj.moves = 0
-                        self.obj.secret = True
-                        pygame.mixer.music.pause()
-                        self.sett.snd_bad.play()
-                    else:
-                        if(next_ske not in (self.obj.wall_pos + self.obj.hwall_pos + self.obj.stone_pos + self.obj.ske_pos + self.obj.lock_pos)):
-                            if((next_ske in  self.obj.spike_pos) or ((next_ske in self.obj.holea_pos) and (self.obj.popup == True)) or ((next_ske in self.obj.holeb_pos) and (self.obj.popup == False))):
-                                self.ske_dead_idx = 1
-                                self.obj.ske_dead_pos.append(next_ske)
-                                self.obj.player_touch_pos.append(self.obj.player_pos[0])
-                                self.obj.player_touch_pos.append(self.obj.player_pos[1])
-                                self.player_touch_idx = 1
-                                del self.obj.ske_pos[ske_count]                               
-                            else:
-                                self.obj.player_touch_pos.append(self.obj.player_pos[0])
-                                self.obj.player_touch_pos.append(self.obj.player_pos[1])
-                                self.player_touch_idx = 1
-                                self.next_ske_pos = ske_count
-                                self.next_ske_loc = next_ske
-                                self.check_ske = True
+                ske_counts += 1
+                if(((pos in self.obj.holea_pos) and (self.obj.popup == True)) or ((pos in self.obj.holeb_pos) and (self.obj.popup == False))):
+                    self.ske_dead_idx = 1
+                    self.obj.ske_dead_pos.append(self.obj.ske_pos[ske_counts])
+                    del self.obj.ske_pos[ske_counts]
+            if(touch_goal):
+                self.obj.player_pos = [self.obj.player_pos[0] + dir[1], self.obj.player_pos[1] + dir[0]]
+                pygame.mixer.music.pause()
+                if(self.obj.level != 8):
+                    self.sett.snd_lvlup.play()
+                    self.obj.levelup = True
+                else:
+                    self.sett.cutscenes = pygame.image.load(f'assets/cutscenes/cutscenes_0.png').convert_alpha()
+                    self.sett.cutscenes = pygame.transform.scale(self.sett.cutscenes, (150, 150))
+                    self.obj.final = True
+                    self.obj.player_pos = [8, 5]
+            elif(touch_stone):
+                stone_count = -1
+                for pos in self.obj.stone_pos:
+                    stone_count += 1
+                    if(next_move == pos):
+                        next_stone = [pos[0] + dir[1], pos[1] + dir[0]]
+                        if(next_stone not in (self.obj.wall_pos + self.obj.hwall_pos + self.obj.stone_pos + self.obj.ske_pos + self.obj.lock_pos + self.obj.goal_pos)):
+                            self.next_stone_pos = stone_count
+                            self.next_stone_loc = next_stone
+                            self.check_stone = True
+                        if(stand_spike):
+                            self.act(0, dir)
+                            self.obj.hurt = True
+                            self.sfx_spike_idx = 1
+                            self.snd_hurt = True
+                        self.snd_touch = True
+                        self.obj.player_touch_pos.append(self.obj.player_pos[0])
+                        self.obj.player_touch_pos.append(self.obj.player_pos[1])
+                        self.player_touch_idx = 1
+                        self.act(2, dir)
+            elif(touch_ske):
+                ske_count = -1
+                for pos in self.obj.ske_pos:
+                    ske_count += 1
+                    if(next_move == pos):
+                        next_ske = [pos[0] + dir[1], pos[1] + dir[0]]
+                        if(next_ske in self.obj.goal_pos):
+                            self.obj.moves = 0
+                            self.obj.secret = True
+                            pygame.mixer.music.pause()
+                            self.sett.snd_fail.play()
                         else:
-                            if(next_ske in self.obj.spike_pos):
-                                self.ske_dead_idx = 1
-                                self.obj.ske_dead_pos.append(next_ske)
+                            if(next_ske not in (self.obj.wall_pos + self.obj.hwall_pos + self.obj.stone_pos + self.obj.ske_pos + self.obj.lock_pos)):
+                                if((next_ske in  self.obj.spike_pos) or ((next_ske in self.obj.holea_pos) and (self.obj.popup == True)) or ((next_ske in self.obj.holeb_pos) and (self.obj.popup == False))):
+                                    self.ske_dead_idx = 1
+                                    self.obj.ske_dead_pos.append(next_ske)
+                                    self.obj.player_touch_pos.append(self.obj.player_pos[0])
+                                    self.obj.player_touch_pos.append(self.obj.player_pos[1])
+                                    self.player_touch_idx = 1
+                                    del self.obj.ske_pos[ske_count]
+                                    self.sett.snd_kill.play()
+                                else:
+                                    self.obj.player_touch_pos.append(self.obj.player_pos[0])
+                                    self.obj.player_touch_pos.append(self.obj.player_pos[1])
+                                    self.player_touch_idx = 1
+                                    self.next_ske_pos = ske_count
+                                    self.next_ske_loc = next_ske
+                                    self.check_ske = True
+                                    self.snd_touch = True
                             else:
                                 self.ske_dead_idx = 1
                                 self.obj.ske_dead_pos.append(self.obj.ske_pos[ske_count])
-                            self.obj.player_kill_pos.append(self.obj.player_pos[0])
-                            self.obj.player_kill_pos.append(self.obj.player_pos[1])
-                            self.player_kill_idx = 1
-                            del self.obj.ske_pos[ske_count]
-                        self.act(2, dir)
-                    if(stand_spike):
-                        self.obj.hurt = True
-                        self.snd_hurt = True
-                        self.sfx_spike_idx = 1
-                        self.act(0, dir)
-        elif(touch_key):
-            key_count = -1
-            for pos in self.obj.key_pos:
-                key_count += 1
-                if(next_move == pos):
-                    del self.obj.key_pos[key_count]
-                    self.obj.getkey = True
-                    if(touch_spike):
-                        self.act(0, dir)
-                    self.act(1, dir)
-        elif(touch_lock):
-            lock_count = -1
-            for pos in self.obj.lock_pos:
-                lock_count += 1
-                if(next_move == pos):
-                    if(self.obj.getkey):
-                        self.obj.unlock = True
-                        self.obj.getkey = False
+                                self.obj.player_kill_pos.append(self.obj.player_pos[0])
+                                self.obj.player_kill_pos.append(self.obj.player_pos[1])
+                                self.player_kill_idx = 1
+                                del self.obj.ske_pos[ske_count]
+                                self.sett.snd_kill.play()
+                            self.act(2, dir)
+                        if(stand_spike):
+                            self.obj.hurt = True
+                            self.snd_hurt = True
+                            self.sfx_spike_idx = 1
+                            self.act(0, dir)
+            elif(touch_key):
+                key_count = -1
+                for pos in self.obj.key_pos:
+                    key_count += 1
+                    if(next_move == pos):
+                        del self.obj.key_pos[key_count]
+                        self.obj.getkey = True
+                        if(touch_spike):
+                            self.act(0, dir)
                         self.act(1, dir)
-        elif(touch_spike):
-            self.act(0, dir)
-            self.act(1, dir)
-            self.obj.hurt = True
-            self.sfx_spike_idx = 1
-            self.snd_hurt = True
-        elif(not touch_wall and not touch_ske_dead):
-            if(self.obj.level == 0):
-                if(self.obj.quit):
-                    if(dir[0] != 0):
-                        if(self.obj.choose + dir[0] in range(1, 3)):
-                            self.obj.player_pos = [self.obj.player_pos[0], self.obj.player_pos[1] + dir[0]*5]
-                            self.obj.choose += dir[0]
-                else:
-                    if((self.obj.menu == 1) and (dir[1] != 0)):
-                        if((self.obj.choose + dir[1]) in range(1, 7)):
-                            self.obj.player_pos = next_move
-                            self.obj.choose += dir[1]
-                        elif((self.obj.choose + dir[1]) < 1):
-                            self.obj.player_pos = [self.obj.player_pos[0] - dir[1]*5, self.obj.player_pos[1]]
-                            self.obj.choose = 6
-                        elif((self.obj.choose + dir[1]) > 6):
-                            self.obj.player_pos = [self.obj.player_pos[0] - dir[1]*5, self.obj.player_pos[1]]
-                            self.obj.choose = 1
-                    elif(self.obj.menu == 2):
-                        if(dir[0] != 0):
-                            if(((self.obj.lvl_choose + dir[0]) in range(1, 5) and (self.obj.lvl_state == 1)) or ((self.obj.lvl_choose + dir[0]) in range(5, 9) and (self.obj.lvl_state == 2))):
-                                if(self.obj.level_list[self.obj.lvl_choose + dir[0] - 1]):
-                                    self.obj.player_pos = [self.obj.player_pos[0], self.obj.player_pos[1] + dir[0]*4]
-                                    self.obj.lvl_choose += dir[0]
-                        else:
-                            if((self.obj.lvl_choose + dir[1]*4) in range(1, 9)):
-                                if(self.obj.level_list[self.obj.lvl_choose + dir[1]*4 - 1]):
-                                    self.obj.player_pos = [self.obj.player_pos[0] + dir[1]*4, self.obj.player_pos[1]]
-                                    self.obj.lvl_choose += dir[1]*4
-                                    self.obj.lvl_state += dir[1]
-            else:
+            elif(touch_lock):
+                lock_count = -1
+                for pos in self.obj.lock_pos:
+                    lock_count += 1
+                    if(next_move == pos):
+                        if(self.obj.getkey):
+                            self.obj.unlock = True
+                            self.obj.getkey = False
+                            self.act(1, dir)
+            elif(touch_spike):
+                self.act(0, dir)
                 self.act(1, dir)
+                self.obj.hurt = True
+                self.sfx_spike_idx = 1
+                self.snd_hurt = True
+            elif(not touch_wall and not touch_ske_dead):
+                if(self.obj.level == 0):
+                    if(self.obj.quit):
+                        if(dir[0] != 0):
+                            if(self.obj.choose + dir[0] in range(1, 3)):
+                                self.obj.player_pos = [self.obj.player_pos[0], self.obj.player_pos[1] + dir[0]*5]
+                                self.obj.choose += dir[0]
+                    else:
+                        if((self.obj.menu == 1) and (dir[1] != 0)):
+                            if((self.obj.choose + dir[1]) in range(1, 7)):
+                                self.obj.player_pos = next_move
+                                self.obj.choose += dir[1]
+                            elif((self.obj.choose + dir[1]) < 1):
+                                self.obj.player_pos = [self.obj.player_pos[0] - dir[1]*5, self.obj.player_pos[1]]
+                                self.obj.choose = 6
+                            elif((self.obj.choose + dir[1]) > 6):
+                                self.obj.player_pos = [self.obj.player_pos[0] - dir[1]*5, self.obj.player_pos[1]]
+                                self.obj.choose = 1
+                        elif(self.obj.menu == 2):
+                            if(dir[0] != 0):
+                                if(((self.obj.lvl_choose + dir[0]) in range(1, 5) and (self.obj.lvl_state == 1)) or ((self.obj.lvl_choose + dir[0]) in range(5, 9) and (self.obj.lvl_state == 2))):
+                                    if(self.obj.level_list[self.obj.lvl_choose + dir[0] - 1]):
+                                        self.obj.player_pos = [self.obj.player_pos[0], self.obj.player_pos[1] + dir[0]*4]
+                                        self.obj.lvl_choose += dir[0]
+                            else:
+                                if((self.obj.lvl_choose + dir[1]*4) in range(1, 9)):
+                                    if(self.obj.level_list[self.obj.lvl_choose + dir[1]*4 - 1]):
+                                        self.obj.player_pos = [self.obj.player_pos[0] + dir[1]*4, self.obj.player_pos[1]]
+                                        self.obj.lvl_choose += dir[1]*4
+                                        self.obj.lvl_state += dir[1]
+                else:
+                    self.act(1, dir)
             
-
     def act(self, possive, dir):
         if(possive == 1):
             self.obj.player_walk_pos.append(self.obj.player_pos[0])
@@ -747,7 +802,7 @@ class Board:
                         elif ((event.key == pygame.K_r) and (not self.obj.hurt) and (not self.obj.walk) and (self.obj.player_pos != self.obj.player_kill_pos) and (self.obj.player_pos != self.obj.player_touch_pos)):
                             self.ske_idle_idx = 1
                             pygame.mixer.stop()
-                            if(self.obj.moves <= 0):
+                            if(self.obj.moves <= 0 or self.obj.levelup):
                                 pygame.mixer.music.unpause()
                             self.obj.__init__()
                         elif event.key == pygame.K_l:
@@ -782,6 +837,17 @@ class Board:
                             if(self.obj.level == 0):
                                 self.obj.menu = 4
                                 self.obj.player_pos = [self.obj.player_pos[0] + 3, self.obj.player_pos[1]]
+                        elif((event.key == pygame.K_SPACE) and self.obj.final):
+                            if(self.obj.final_score in self.obj.ending):
+                                self.obj.levelup = True
+                            else:
+                                self.obj.change = True
+                                if(self.obj.final_choose == 1):
+                                    self.obj.final_score += self.obj.fchoose_1[self.obj.final_score]
+                                elif(self.obj.final_choose == 2):
+                                    self.obj.final_score += self.obj.fchoose_2[self.obj.final_score]
+                                    self.obj.final_choose = 1
+                                    self.obj.player_pos = [self.obj.player_pos[0] - 2, self.obj.player_pos[1]]
             if(self.obj.level == 0):
                 self._draw_main_menu()
             else:
