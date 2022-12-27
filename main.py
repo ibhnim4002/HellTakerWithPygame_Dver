@@ -24,9 +24,9 @@ class Settings:
         self.hud = pygame.image.load('assets/backgrounds/hud.png').convert_alpha()
         self.hud = pygame.transform.scale(self.hud, (self.width, self.height))
         self.cutscenes = pygame.image.load('assets/cutscenes/cutscenes_0.png').convert_alpha()
-        self.cutscenes = pygame.transform.scale(self.cutscenes, (self.width, self.height))
+        self.cutscenes = pygame.transform.scale(self.cutscenes, (200, 200))
         self.box = pygame.image.load('assets/backgrounds/dialog_box.png').convert_alpha()
-        self.box = pygame.transform.scale(self.cutscenes, (self.width, 300))
+        self.box = pygame.transform.scale(self.box, (self.width, 300))
         self.player = pygame.image.load('assets/objects/player/player.png').convert_alpha()
         self.player = pygame.transform.scale(self.player, (50, 50))
         self.player_kill = pygame.image.load('assets/objects/player/player_kill_1.png').convert_alpha()
@@ -338,7 +338,7 @@ class Board:
                 self.obj.walk = False
         if(self.obj.change):
             self.sett.cutscenes = pygame.image.load(f'assets/cutscenes/cutscenes_{self.obj.final_score}.png').convert_alpha()
-            self.sett.cutscenes = pygame.transform.scale(self.sett.cutscenes, (150, 150))
+            self.sett.cutscenes = pygame.transform.scale(self.sett.cutscenes, (400, 400))
             self.obj.change = False
                 
     def _draw_main_menu(self):
@@ -452,12 +452,14 @@ class Board:
             self.sett.screen.blit(self.sett.tutorial.render("SPACE để tiếp tục", False, (192, 192, 192)), (11.5 * 50, 11 * 50))
         elif(self.obj.final):
             self.sett.screen.blit(self.sett.background, (0, 0))
-            self.sett.screen.blit(self.sett.cutscenes, (400, 200))
-            self.sett.screen.blit(self.sett.cutscenes, (0, 400))
-            self.sett.screen.blit(self.sett.tutorial.render(str(self.obj.fscript_0[self.obj.final_score]), False, (192, 192, 192)), (5 * 50, 6 * 50))
-            self.sett.screen.blit(self.sett.tutorial.render(str(self.obj.fscript_1[self.obj.final_score]), False, (192, 192, 192)), (5 * 50, 8 * 50))
-            self.sett.screen.blit(self.sett.tutorial.render(str(self.obj.fscript_2[self.obj.final_score]), False, (192, 192, 192)), (5 * 50, 10 * 50))
-            self.sett.screen.blit(self.sett.player, (self.obj.player_pos[1] * 50, self.obj.player_pos[0] * 50))       
+            self.sett.screen.blit(self.sett.cutscenes, (self.sett.cutscenes.get_rect(center = (650, 350)).x, 50))
+            self.sett.screen.blit(self.sett.box, (0, 400))
+            self.sett.screen.blit(self.sett.main_menu.render(str(self.obj.fscript_0[self.obj.final_score]), False, (192, 192, 192)), (5 * 50, 8.5 * 50))
+            self.sett.screen.blit(self.sett.tutorial.render(str(self.obj.fscript_1[self.obj.final_score]), False, (192, 192, 192)), (7 * 50, 10 * 50 + 15))
+            self.sett.screen.blit(self.sett.tutorial.render(str(self.obj.fscript_2[self.obj.final_score]), False, (192, 192, 192)), (7 * 50, 11 * 50 + 15))
+            self.sett.screen.blit(self.sett.main_menu_2.render("SPACE để tiếp tục", False, (192, 192, 192)), (11.5 * 50, 13 * 50))
+            if(self.obj.fchoose_1[self.obj.final_score]):
+                self.sett.screen.blit(self.sett.player, (self.obj.player_pos[1] * 50, self.obj.player_pos[0] * 50))       
         else:
             self.sett.screen.blit(self.sett.background, (0, 0))
             self.sett.screen.blit(self.sett.hud, (0, 0))
@@ -517,7 +519,7 @@ class Board:
             if(dir[1] != 0):
                 if(self.obj.fchoose_2[self.obj.final_score]):
                     if((self.obj.final_choose + dir[1]) in range(1, 3)):
-                        self.obj.player_pos = [self.obj.player_pos[0] + dir[1]*2, self.obj.player_pos[1]]
+                        self.obj.player_pos = [self.obj.player_pos[0] + dir[1], self.obj.player_pos[1]]
                         self.obj.final_choose += dir[1]
         else:
             if(dir[0] == -1):
@@ -577,9 +579,9 @@ class Board:
                     self.obj.levelup = True
                 else:
                     self.sett.cutscenes = pygame.image.load(f'assets/cutscenes/cutscenes_0.png').convert_alpha()
-                    self.sett.cutscenes = pygame.transform.scale(self.sett.cutscenes, (150, 150))
+                    self.sett.cutscenes = pygame.transform.scale(self.sett.cutscenes, (400, 400))
                     self.obj.final = True
-                    self.obj.player_pos = [8, 5]
+                    self.obj.player_pos = [10, 6]
             elif(touch_stone):
                 stone_count = -1
                 for pos in self.obj.stone_pos:
@@ -863,7 +865,7 @@ class Board:
                                 elif(self.obj.final_choose == 2):
                                     self.obj.final_score += self.obj.fchoose_2[self.obj.final_score]
                                     self.obj.final_choose = 1
-                                    self.obj.player_pos = [self.obj.player_pos[0] - 2, self.obj.player_pos[1]]
+                                    self.obj.player_pos = [self.obj.player_pos[0] - 1, self.obj.player_pos[1]]
                                 if(self.obj.final_score == 18):
                                     self.sett.snd_demon.play()
                                 elif(self.obj.final_score == 19 or self.obj.final_score == 9):
