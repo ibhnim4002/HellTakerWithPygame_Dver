@@ -2,10 +2,14 @@
 Khoa Công nghệ Thông tin
 Lớp 22CLC10
 
-SUStalker: The Vô Cực Universe
+SUStalker: Đường Vào Tim Em
 
 Giảng viên hướng dẫn:
 Thầy Vũ Quốc Hoàng
+
+Idea:
+Võ Việt Long
+Văn Bá Đức Kiên
 
 Coder:
 Văn Bá Đức Kiên
@@ -17,8 +21,8 @@ Võ Việt Long
 Soundtracks:
 Võ Việt Long
 
-Scripter:
-Văn Bá Đức Kiên
+Story:
+Võ Việt Long
 
 Powerpoint thuyết trình:
 Nguyễn Hà Anh
@@ -29,4 +33,9 @@ Thái Hữu Thọ
 
 Credits:
 Nguyễn Lê Thanh Duy
+Thái Hữu Thọ
 
+Hình ảnh được mượn từ các game:
+Among Us
+Minecraft
+Terraria
