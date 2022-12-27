@@ -565,6 +565,7 @@ class Board:
                     self.ske_dead_idx = 1
                     self.obj.ske_dead_pos.append(self.obj.ske_pos[ske_counts])
                     del self.obj.ske_pos[ske_counts]
+                    self.sett.snd_kill.play()
             if(touch_goal):
                 self.obj.player_pos = [self.obj.player_pos[0] + dir[1], self.obj.player_pos[1] + dir[0]]
                 if(self.obj.level != 8):
