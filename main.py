@@ -156,6 +156,7 @@ class Object:
         self.ending = []
         self.change = False
         self.true_win = False
+        self.vision = []
         if(self.level == 9):
             self.level = 0
         if(self.level > 10):
@@ -175,6 +176,8 @@ class Object:
                 self.fscript_2[i] = self.fscript_2[i][0:len(self.fscript_2[i])-1]
             for i in range (0, self.cutscenes):
                 self.fchoose_2.append(int(f.readline()))
+            for i in range (0, self.cutscenes):
+                self.vision.append(int(f.readline()))
             for row in f.read().splitlines():
                 self.ending.append(int(row))
         with open('levels/lvl.txt', 'r') as f:
@@ -459,7 +462,7 @@ class Board:
             self.sett.screen.blit(self.sett.tutorial.render(str(self.obj.fscript_1[self.obj.final_score]), False, (192, 192, 192)), (7 * 50, 10 * 50 + 15))
             self.sett.screen.blit(self.sett.tutorial.render(str(self.obj.fscript_2[self.obj.final_score]), False, (192, 192, 192)), (7 * 50, 11 * 50 + 15))
             self.sett.screen.blit(self.sett.main_menu_2.render("SPACE để tiếp tục", False, (192, 192, 192)), (11.5 * 50, 13 * 50))
-            if(self.obj.fchoose_1[self.obj.final_score]):
+            if(self.obj.vision[self.obj.final_score]):
                 self.sett.screen.blit(self.sett.player, (self.obj.player_pos[1] * 50, self.obj.player_pos[0] * 50))       
         else:
             self.sett.screen.blit(self.sett.background, (0, 0))
@@ -838,6 +841,7 @@ class Board:
                                 pygame.mixer.stop()
                                 pygame.mixer.music.unpause()                               
                             else:
+                                self.cre_run = 0
                                 if(self.obj.final_score != 19):                                
                                     pygame.mixer.stop()
                                     pygame.mixer.music.load('assets/soundtracks/menu.mp3')
@@ -845,11 +849,12 @@ class Board:
                                     if(self.obj.final_score != 13):
                                         with open('levels/lvl.txt', 'w') as f:
                                             f.write("1\n0\n0\n0\n0\n0\n0\n0")
+                                else:
+                                    self.obj.true_win = True
                             self.obj.level += 1
                             self.ske_idle_idx = 1
                             self.obj.__init__()
                             if(self.obj.level == 0):
-                                self.obj.true_win = True
                                 self.obj.menu = 4
                                 self.obj.player_pos = [self.obj.player_pos[0] + 3, self.obj.player_pos[1]]
                         elif((event.key == pygame.K_SPACE) and self.obj.final):
