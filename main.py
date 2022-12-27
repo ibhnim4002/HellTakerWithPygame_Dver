@@ -155,6 +155,7 @@ class Object:
         self.fscript_2 = []
         self.ending = []
         self.change = False
+        self.true_win = False
         if(self.level == 9):
             self.level = 0
         if(self.level > 10):
@@ -789,6 +790,10 @@ class Board:
                                 self.obj.menu = 1
                                 self.obj.choose = 1
                                 self.obj.player_pos = [self.obj.player_pos[0] - 3, self.obj.player_pos[1]]
+                                if(self.obj.true_win):
+                                    pygame.mixer.music.load('assets/soundtracks/menu.mp3')
+                                    pygame.mixer.music.play(loops = -1, fade_ms = 3000)
+                                    self.obj.true_win = False
                             elif(self.obj.menu == 5):
                                 pygame.mixer.music.load('assets/soundtracks/menu.mp3')
                                 pygame.mixer.music.play(loops = -1, fade_ms = 3000)
@@ -833,14 +838,18 @@ class Board:
                                 pygame.mixer.stop()
                                 pygame.mixer.music.unpause()                               
                             else:
-                                pygame.mixer.stop()
-                                pygame.mixer.music.load('assets/soundtracks/menu.mp3')
-                                pygame.mixer.music.play(loops = -1, fade_ms = 3000)
-                                self.obj.menu = 5
+                                if(self.obj.final_score != 19):                                
+                                    pygame.mixer.stop()
+                                    pygame.mixer.music.load('assets/soundtracks/menu.mp3')
+                                    pygame.mixer.music.play(loops = -1, fade_ms = 3000)
+                                    if(self.obj.final_score != 13):
+                                        with open('levels/lvl.txt', 'w') as f:
+                                            f.write("1\n0\n0\n0\n0\n0\n0\n0")
                             self.obj.level += 1
                             self.ske_idle_idx = 1
                             self.obj.__init__()
                             if(self.obj.level == 0):
+                                self.obj.true_win = True
                                 self.obj.menu = 4
                                 self.obj.player_pos = [self.obj.player_pos[0] + 3, self.obj.player_pos[1]]
                         elif((event.key == pygame.K_SPACE) and self.obj.final):
