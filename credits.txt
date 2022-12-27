@@ -7,7 +7,10 @@ SUStalker: Đường Vào Tim Em
 Giảng viên hướng dẫn:
 Thầy Vũ Quốc Hoàng
 
-Idea:
+Special honor:
+Nguyễn Anh Kiệt
+
+Idea game:
 Võ Việt Long
 Văn Bá Đức Kiên
 
@@ -35,8 +38,13 @@ Credits:
 Nguyễn Lê Thanh Duy
 Thái Hữu Thọ
 
-Special honor:
-Nguyễn Anh Kiệt
+Tester:
+Nguyễn Hà Anh
+Văn Bá Đức Kiên
+Võ Việt Long
+Bùi Công Mậu
+Thái Hữu Thọ
+Nguyễn Lê Thanh Duy
 
 Hình ảnh được mượn từ các game:
 Among Us
