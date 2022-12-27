@@ -82,9 +82,10 @@ class Settings:
         self.snd_touch = pygame.mixer.Sound('assets/soundtracks/touch.mp3')
         self.snd_lvlup = pygame.mixer.Sound('assets/soundtracks/lvlup.mp3')
         self.snd_bad = pygame.mixer.Sound('assets/soundtracks/bad_end.mp3')
-        self.snd_true = pygame.mixer.Sound('assets/soundtracks/true_end.mp3')
         self.snd_nut = pygame.mixer.Sound('assets/soundtracks/cracked_nut_end.mp3')
         self.snd_kill = pygame.mixer.Sound('assets/soundtracks/kill.mp3')
+        self.snd_demon = pygame.mixer.Sound('assets/soundtracks/true_pink.mp3')
+        self.snd_gun = pygame.mixer.Sound('assets/soundtracks/gun_shot.mp3')
 
 class Object:
     wall_list = ['#']
@@ -189,7 +190,6 @@ class Object:
                 self.all_pos.append(list(row))
             self.row_count = len(self.all_pos)
             self.col_count = 0
-        print(self.fchoose_1, self.fchoose_2)
         for i in range (0, len(self.all_pos)):
             self.in_col_count = 0
             for j in range (0, len(self.all_pos[i])):
@@ -567,8 +567,8 @@ class Board:
                     del self.obj.ske_pos[ske_counts]
             if(touch_goal):
                 self.obj.player_pos = [self.obj.player_pos[0] + dir[1], self.obj.player_pos[1] + dir[0]]
-                pygame.mixer.music.pause()
                 if(self.obj.level != 8):
+                    pygame.mixer.music.pause()
                     self.sett.snd_lvlup.play()
                     self.obj.levelup = True
                 else:
@@ -606,7 +606,7 @@ class Board:
                             self.obj.moves = 0
                             self.obj.secret = True
                             pygame.mixer.music.pause()
-                            self.sett.snd_fail.play()
+                            self.sett.snd_bad.play()
                         else:
                             if(next_ske not in (self.obj.wall_pos + self.obj.hwall_pos + self.obj.stone_pos + self.obj.ske_pos + self.obj.lock_pos)):
                                 if((next_ske in  self.obj.spike_pos) or ((next_ske in self.obj.holea_pos) and (self.obj.popup == True)) or ((next_ske in self.obj.holeb_pos) and (self.obj.popup == False))):
@@ -840,6 +840,18 @@ class Board:
                         elif((event.key == pygame.K_SPACE) and self.obj.final):
                             if(self.obj.final_score in self.obj.ending):
                                 self.obj.levelup = True
+                                if(self.obj.final_score == 8):
+                                    pygame.mixer.music.load('assets/soundtracks/dead_end.mp3')
+                                    pygame.mixer.music.play(loops = -1, fade_ms = 3000)
+                                elif(self.obj.final_score == 9):
+                                    pygame.mixer.music.pause()
+                                    self.sett.snd_nut.play()
+                                elif(self.obj.final_score == 13):
+                                    pygame.mixer.music.load('assets/soundtracks/good_end.mp3')
+                                    pygame.mixer.music.play(loops = -1, fade_ms = 3000)
+                                elif(self.obj.final_score == 19):
+                                    pygame.mixer.music.load('assets/soundtracks/true_end.mp3')
+                                    pygame.mixer.music.play(loops = -1, fade_ms = 3000)
                             else:
                                 self.obj.change = True
                                 if(self.obj.final_choose == 1):
@@ -848,6 +860,10 @@ class Board:
                                     self.obj.final_score += self.obj.fchoose_2[self.obj.final_score]
                                     self.obj.final_choose = 1
                                     self.obj.player_pos = [self.obj.player_pos[0] - 2, self.obj.player_pos[1]]
+                                if(self.obj.final_score == 18):
+                                    self.sett.snd_demon.play()
+                                elif(self.obj.final_score == 19 or self.obj.final_score == 9):
+                                    self.sett.snd_gun.play()
             if(self.obj.level == 0):
                 self._draw_main_menu()
             else:
