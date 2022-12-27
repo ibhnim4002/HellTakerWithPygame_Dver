@@ -155,7 +155,6 @@ class Object:
         self.fscript_2 = []
         self.ending = []
         self.change = False
-        self.true_win = False
         self.vision = []
         if(self.level == 9):
             self.level = 0
@@ -258,6 +257,7 @@ class Board:
         self.cre_run = 0
         self.snd_hurt = False
         self.snd_touch = False
+        self.true_win = False
 
     def _sprite(self):
         self.ske_idle_idx += 0.3
@@ -793,7 +793,7 @@ class Board:
                                 self.obj.menu = 1
                                 self.obj.choose = 1
                                 self.obj.player_pos = [self.obj.player_pos[0] - 3, self.obj.player_pos[1]]
-                                if(self.obj.true_win):
+                                if(self.true_win):
                                     pygame.mixer.music.load('assets/soundtracks/menu.mp3')
                                     pygame.mixer.music.play(loops = -1, fade_ms = 3000)
                                     self.obj.true_win = False
@@ -850,7 +850,7 @@ class Board:
                                         with open('levels/lvl.txt', 'w') as f:
                                             f.write("1\n0\n0\n0\n0\n0\n0\n0")
                                 else:
-                                    self.obj.true_win = True
+                                    self.true_win = True
                             self.obj.level += 1
                             self.ske_idle_idx = 1
                             self.obj.__init__()
@@ -860,6 +860,7 @@ class Board:
                         elif((event.key == pygame.K_SPACE) and self.obj.final):
                             if(self.obj.final_score in self.obj.ending):
                                 self.obj.levelup = True
+                                pygame.mixer.stop()
                                 if(self.obj.final_score == 8):
                                     pygame.mixer.music.load('assets/soundtracks/dead_end.mp3')
                                     pygame.mixer.music.play(loops = -1, fade_ms = 3000)
