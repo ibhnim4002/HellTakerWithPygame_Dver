@@ -925,7 +925,7 @@ class Board:
                                     pygame.mixer.music.pause()
                                     self.sett.snd_nut.play()
                                 elif(self.obj.final_score == 13):
-                                    pygame.mixer.music.load('assets/soundtracks/good_end2.mp3')
+                                    pygame.mixer.music.load('assets/soundtracks/good_end.mp3')
                                     pygame.mixer.music.play(loops = -1)
                                 elif(self.obj.final_score == 19):
                                     pygame.mixer.music.load('assets/soundtracks/true_end.mp3')
