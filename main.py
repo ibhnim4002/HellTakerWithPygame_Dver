@@ -295,8 +295,10 @@ class Board:
             self.player_touch_idx = 1
             self.obj.player_touch_pos.clear()
         if(self.player_touch_idx >= 16):
-            if(self.snd_touch):
+            if(self.snd_touch and self.obj.moves > 0):
                 self.sett.snd_touch.play(loops = 1)
+                self.snd_touch = False
+            else:
                 self.snd_touch = False
             if(self.check_ske):
                 self.obj.ske_pos[self.next_ske_pos] = self.next_ske_loc
@@ -725,6 +727,7 @@ class Board:
             self.holeb_popup = not self.holeb_popup
             if(self.obj.moves <= 0):
                 pygame.mixer.music.pause()
+                pygame.mixer.stop()
                 self.sett.snd_bad.play()
         elif(possive == 2):
             self.obj.moves -= 1
@@ -732,10 +735,14 @@ class Board:
             self.holea_popup = not self.holea_popup
             self.holeb_popup = not self.holeb_popup
             if(self.obj.moves <= 0):
+                pygame.mixer.music.pause()
+                pygame.mixer.stop()
                 self.sett.snd_bad.play()
         else:
             self.obj.moves -=1
             if(self.obj.moves <= 0):
+                pygame.mixer.music.pause()
+                pygame.mixer.stop()
                 self.sett.snd_bad.play()
         
     
@@ -814,6 +821,7 @@ class Board:
                                 self.move(self.sett.KEY_DIR[event.key])
                         elif event.key == pygame.K_ESCAPE:
                             self.obj.level = 0
+                            pygame.mixer.stop()
                             pygame.mixer.music.load('assets/soundtracks/menu.mp3')
                             pygame.mixer.music.play(loops = -1, fade_ms = 3000)
                             self.obj.__init__()
