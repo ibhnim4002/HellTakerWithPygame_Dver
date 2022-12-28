@@ -158,10 +158,9 @@ class Object:
         self.ending = []
         self.change = False
         self.vision = []
+        self.cheat = 0
         if(self.level == 9):
             self.level = 0
-        if(self.level > 10):
-            self.level = 1
         with open('assets/ending.txt', 'r', encoding = 'utf-8-sig') as f:
             self.cutscenes = int(f.readline())
             for i in range (0, self.cutscenes):
@@ -232,7 +231,7 @@ class Board:
     def __init__(self):
         self.sett = Settings()
         self.obj = Object()
-        pygame.display.set_caption("SUStalker")
+        pygame.display.set_caption("SUStalker: Đường vào tim em")
         pygame.mouse.set_visible(False)
         pygame.event.set_grab(True)
         self.ske_idle_idx = 1
@@ -246,10 +245,8 @@ class Board:
         self.react = 0
         self.next_ske_pos = 0
         self.next_ske_loc = []
-        self.check_ske = False
         self.next_stone_pos = 0
         self.next_stone_loc =[]
-        self.check_stone = False
         self.event_player_rect = self.sett.player.get_rect(center = (650, 350))
         self.holea_popup = False
         self.holeb_popup = False
@@ -259,6 +256,8 @@ class Board:
         self.cre_run = 0
         self.snd_hurt = False
         self.snd_touch = False
+        self.check_ske = False
+        self.check_stone = False
         self.true_win = False
 
     def _sprite(self):
@@ -300,19 +299,25 @@ class Board:
                 self.snd_touch = False
             else:
                 self.snd_touch = False
-            if(self.check_ske):
+            if(self.check_ske and self.obj.moves > 0):
                 self.obj.ske_pos[self.next_ske_pos] = self.next_ske_loc
                 self.check_ske = False
-            if(self.check_stone):
+            else:
+                self.check_ske = False
+            if(self.check_stone and self.obj.moves > 0):
                 self.obj.stone_pos[self.next_stone_pos] = self.next_stone_loc
+                self.check_stone = False
+            else:
                 self.check_stone = False
         if(not self.obj.walk):
             self.sfx_spike_idx += 0.8
             self.sfx_spike_idx_int = int(self.sfx_spike_idx)
             self.sett.sfx_spike = pygame.image.load(f'assets/objects/sfx/spike_{self.sfx_spike_idx_int}.png').convert_alpha()
             self.sett.sfx_spike = pygame.transform.scale(self.sett.sfx_spike, (50, 50))
-            if(self.snd_hurt):
+            if(self.snd_hurt and self.obj.moves > 0):
                 self.sett.snd_hurt.play()
+                self.snd_hurt = False
+            else:
                 self.snd_hurt = False
             if(self.sfx_spike_idx >= 8.19):
                 self.sfx_spike_idx = 1
@@ -816,33 +821,68 @@ class Board:
                             if(self.obj.menu == 2):
                                 self.obj.__init__()
                     else:
+                        if(event.key not in [pygame.K_a, pygame.K_n, pygame.K_g, pygame.K_e, pygame.K_l]):
+                           self.obj.cheat = 0
                         if((event.key in self.sett.KEY_DIR) and (not self.obj.hurt) and (not self.obj.walk) and (self.obj.player_pos != self.obj.player_kill_pos) and (self.obj.player_pos != self.obj.player_touch_pos)):
                             if(self.obj.moves > 0):
                                 self.move(self.sett.KEY_DIR[event.key])
                         elif event.key == pygame.K_ESCAPE:
                             self.obj.level = 0
+                            self.snd_hurt = False
+                            self.snd_touch = False
+                            self.check_ske = False
+                            self.check_stone = False
+                            self.ske_idle_idx = 1
+                            self.ske_dead_idx = 1
+                            self.player_kill_idx = 1
+                            self.player_touch_idx = 1
+                            self.player_walk_idx = 1
+                            self.sfx_spike_idx = 1
+                            self.holea_idx = 1
                             pygame.mixer.stop()
                             pygame.mixer.music.load('assets/soundtracks/menu.mp3')
                             pygame.mixer.music.play(loops = -1, fade_ms = 3000)
                             self.obj.__init__()
                         elif ((event.key == pygame.K_r) and (not self.obj.hurt) and (not self.obj.walk) and (self.obj.player_pos != self.obj.player_kill_pos) and (self.obj.player_pos != self.obj.player_touch_pos)):
+                            self.snd_hurt = False
+                            self.snd_touch = False
+                            self.check_ske = False
+                            self.check_stone = False
                             self.ske_idle_idx = 1
+                            self.ske_dead_idx = 1
+                            self.player_kill_idx = 1
+                            self.player_touch_idx = 1
+                            self.player_walk_idx = 1
+                            self.sfx_spike_idx = 1
+                            self.holea_idx = 1
                             pygame.mixer.stop()
                             if(self.obj.moves <= 0 or self.obj.levelup):
                                 pygame.mixer.music.unpause()
                             self.obj.__init__()
-                        elif event.key == pygame.K_l:
-                            self.obj.moves += 10
+                        elif event.key == pygame.K_a:
+                            if self.obj.cheat == 0:
+                                self.obj.cheat += 1
+                            else:
+                                self.obj.cheat = 0
+                        elif event.key == pygame.K_n:
+                            if self.obj.cheat == 1:
+                                self.obj.cheat += 1
+                            else:
+                                self.obj.cheat = 0
+                        elif event.key == pygame.K_g:
+                            if self.obj.cheat == 2:
+                                self.obj.cheat += 1
+                            else:
+                                self.obj.cheat = 0
                         elif event.key == pygame.K_e:
-                            self.obj.moves = 1
-                        elif event.key == pygame.K_z:
-                            self.obj.level += 1
-                            self.ske_idle_idx = 1
-                            self.obj.__init__()
-                        elif event.key == pygame.K_t:
-                            self.obj.level = 10
-                            self.ske_idle_idx = 1
-                            self.obj.__init__()
+                            if self.obj.cheat == 3:
+                                self.obj.cheat += 1
+                            else:
+                                self.obj.cheat = 0
+                        elif event.key == pygame.K_l:
+                            if self.obj.cheat == 4:
+                                self.obj.moves += 10
+                            self.obj.cheat = 0
                         elif((event.key == pygame.K_SPACE) and self.obj.levelup):
                             if(self.obj.level < 8):
                                 if(self.obj.level_list[self.obj.level] == 0):
