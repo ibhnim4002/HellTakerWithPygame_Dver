@@ -3,6 +3,7 @@ Khoa Công nghệ Thông tin
 Lớp 22CLC10
 
 SUStalker: Đường Vào Tim Em
+(Dựa trên Helltaker)
 
 Giảng viên hướng dẫn:
 Thầy Vũ Quốc Hoàng
