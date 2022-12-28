@@ -252,7 +252,7 @@ class Board:
         self.holeb_popup = False
         self.cre_list = []
         for row in self.obj.cre:
-            self.cre_list.append(self.sett.main_menu.render(row[2], False, (192, 192, 192)).get_rect(center = (650, 350)))
+            self.cre_list.append(self.sett.main_menu.render(row[2], False, ('silver')).get_rect(center = (650, 350)))
         self.cre_run = 0
         self.snd_hurt = False
         self.snd_touch = False
@@ -358,59 +358,59 @@ class Board:
         self.sett.screen.blit(self.sett.background, (0, 0))
         if(self.obj.menu == 1):
             if(self.obj.quit):
-                self.sett.screen.blit(self.sett.main_menu.render("Ở lại đi mà", False, (192, 192, 192)), (11 * 50, 4 * 50))
-                self.sett.screen.blit(self.sett.main_menu.render("Ô kê", False, (192, 192, 192)), (10 * 50, 7 * 50))
-                self.sett.screen.blit(self.sett.main_menu.render("Khồng", False, (192, 192, 192)), (15 * 50, 7 * 50))
+                self.sett.screen.blit(self.sett.main_menu.render("Ở lại đi mà", False, ('silver')), (11 * 50, 4 * 50))
+                self.sett.screen.blit(self.sett.main_menu.render("Ô kê", False, ('silver')), (10 * 50, 7 * 50))
+                self.sett.screen.blit(self.sett.main_menu.render("Khồng", False, ('silver')), (15 * 50, 7 * 50))
                 self.sett.screen.blit(self.sett.player, (self.obj.player_pos[1] * 50, self.obj.player_pos[0] * 50))
                 self.sett.screen.blit(self.sett.quit, (4 * 50, 10 * 50))
             else:
-                self.sett.screen.blit(self.sett.main_menu.render("Game mới", False, (192, 192, 192)), (11 * 50, 5 * 50))
-                self.sett.screen.blit(self.sett.main_menu.render("Chọn màn", False, (192, 192, 192)), (11 * 50, 6 * 50))
-                self.sett.screen.blit(self.sett.main_menu.render("Hướng dẫn", False, (192, 192, 192)), (11 * 50, 7 * 50))
-                self.sett.screen.blit(self.sett.main_menu.render("Credit", False, (192, 192, 192)), (11 * 50, 8 * 50))
-                self.sett.screen.blit(self.sett.main_menu.render("Minigame Tết", False, (192, 192, 192)), (11 * 50, 9 * 50))
-                self.sett.screen.blit(self.sett.main_menu.render("Thoát", False, (192, 192, 192)), (11 * 50, 10 * 50))
-                self.sett.screen.blit(self.sett.main_menu_2.render("SPACE để chọn", False, (192, 192, 192)), (11.5 * 50, 12 * 50))
+                self.sett.screen.blit(self.sett.main_menu.render("Game mới", False, ('silver')), (11 * 50, 5 * 50))
+                self.sett.screen.blit(self.sett.main_menu.render("Chọn màn", False, ('silver')), (11 * 50, 6 * 50))
+                self.sett.screen.blit(self.sett.main_menu.render("Hướng dẫn", False, ('silver')), (11 * 50, 7 * 50))
+                self.sett.screen.blit(self.sett.main_menu.render("Credit", False, ('silver')), (11 * 50, 8 * 50))
+                self.sett.screen.blit(self.sett.main_menu.render("Minigame Tết", False, ('silver')), (11 * 50, 9 * 50))
+                self.sett.screen.blit(self.sett.main_menu.render("Thoát", False, ('silver')), (11 * 50, 10 * 50))
+                self.sett.screen.blit(self.sett.main_menu_2.render("SPACE để chọn", False, ('silver')), (11.5 * 50, 12 * 50))
                 self.sett.screen.blit(self.sett.player, (self.obj.player_pos[1] * 50, self.obj.player_pos[0] * 50))
-                self.sett.screen.blit(self.sett.title_1.render("S", False, (192, 192, 192)), (10 * 50, 0 * 50))
-                self.sett.screen.blit(self.sett.title_2.render("Ú", False, (192, 192, 192)), (11.85 * 50, 0.75 * 50))
-                self.sett.screen.blit(self.sett.title_2.render("talkẻ", False, (192, 192, 192)), (11.85 * 50, 2 * 50))
+                self.sett.screen.blit(self.sett.title_1.render("S", False, ('silver')), (10 * 50, 0 * 50))
+                self.sett.screen.blit(self.sett.title_2.render("Ú", False, ('silver')), (11.85 * 50, 0.75 * 50))
+                self.sett.screen.blit(self.sett.title_2.render("talkẻ", False, ('silver')), (11.85 * 50, 2 * 50))
         elif(self.obj.menu == 2):
             for pos in self.sett.lvl_frame_list:
                 self.sett.screen.blit(self.sett.lvl_frame, (pos[0] * 50, pos[1] * 50))
-                self.sett.screen.blit(self.sett.main_menu.render(str(pos[2]), False, (192, 192, 192)), ((pos[0] + 0.82) * 50, (pos[1] + 2) * 50))
+                self.sett.screen.blit(self.sett.main_menu.render(str(pos[2]), False, ('silver')), ((pos[0] + 0.82) * 50, (pos[1] + 2) * 50))
                 if(not self.obj.level_list[pos[2]-1]):
                     self.sett.screen.blit(self.sett.lvl_lock, ((pos[0] + 0.5) * 50, (pos[1] + 0.5) * 50))
             self.sett.screen.blit(self.sett.player, (self.obj.player_pos[1] * 50, self.obj.player_pos[0] * 50))
-            self.sett.screen.blit(self.sett.main_menu_2.render("SPACE để chọn, ESC để quay lại", False, (192, 192, 192)), (10.5 * 50, 12 * 50))
+            self.sett.screen.blit(self.sett.main_menu_2.render("SPACE để chọn, ESC để quay lại", False, ('silver')), (10.5 * 50, 12 * 50))
         elif(self.obj.menu == 3):
-            self.sett.screen.blit(self.sett.tutorial.render("Phím mũi tên để di chuyển", False, (192, 192, 192)), (2 * 50, 2 * 50))
+            self.sett.screen.blit(self.sett.tutorial.render("Phím mũi tên để di chuyển", False, ('silver')), (2 * 50, 2 * 50))
             self.sett.screen.blit(self.sett.arrow, (2.5 * 50, 2.5 * 50))
-            self.sett.screen.blit(self.sett.tutorial.render("Giải cứu sú pónk để qua màn", False, (192, 192, 192)), (9 * 50, 2 * 50))
+            self.sett.screen.blit(self.sett.tutorial.render("Giải cứu sú pónk để qua màn", False, ('silver')), (9 * 50, 2 * 50))
             self.sett.screen.blit(pygame.transform.scale(self.sett.goal, (100, 100)), (11.5 * 50, 3.5 * 50))
-            self.sett.screen.blit(self.sett.tutorial.render("Dồn Người Xương vào Đá", False, (192, 192, 192)), (17 * 50, 2 * 50))
-            self.sett.screen.blit(self.sett.tutorial.render("hoặc Tường để tiêu diệt", False, (192, 192, 192)), (17 * 50, 3 * 50))
+            self.sett.screen.blit(self.sett.tutorial.render("Dồn Người Xương vào Đá", False, ('silver')), (17 * 50, 2 * 50))
+            self.sett.screen.blit(self.sett.tutorial.render("hoặc Tường để tiêu diệt", False, ('silver')), (17 * 50, 3 * 50))
             self.sett.screen.blit(pygame.transform.scale(self.sett.ske, (75, 75)), (17 * 50, 5 * 50))
             self.sett.screen.blit(pygame.transform.scale(self.sett.stone, (75, 75)), (20 * 50, 4 * 50))
             self.sett.screen.blit(pygame.transform.scale(self.sett.hwall, (75, 75)), (20 * 50, 6 * 50))
-            self.sett.screen.blit(self.sett.tutorial.render("Nhặt dao để chém đối thủ", False, (192, 192, 192)), (6.5 * 50, 8 * 50))
+            self.sett.screen.blit(self.sett.tutorial.render("Nhặt dao để chém đối thủ", False, ('silver')), (6.5 * 50, 8 * 50))
             self.sett.screen.blit(pygame.transform.scale(self.sett.key, (75, 75)), (7 * 50, 9 * 50))
             self.sett.screen.blit(pygame.transform.scale(self.sett.lock, (75, 75)), (10 * 50, 9 * 50))
-            self.sett.screen.blit(self.sett.tutorial.render("Cẩn thận hố gai", False, (192, 192, 192)), (15 * 50, 8 * 50))
+            self.sett.screen.blit(self.sett.tutorial.render("Cẩn thận hố gai", False, ('silver')), (15 * 50, 8 * 50))
             self.sett.screen.blit(pygame.transform.scale(self.sett.spike, (75, 75)), (16 * 50, 9 * 50))
-            self.sett.screen.blit(self.sett.main_menu_2.render("SPACE để tiếp tục", False, (192, 192, 192)), (11.5 * 50, 12 * 50))
+            self.sett.screen.blit(self.sett.main_menu_2.render("SPACE để tiếp tục", False, ('silver')), (11.5 * 50, 12 * 50))
         elif(self.obj.menu == 4):
             for row in self.obj.cre:
-                self.sett.screen.blit(self.sett.main_menu.render(row[2], False, (192, 192, 192)), (self.cre_list[row[0]].x, (row[1] - self.cre_run) * 50))
-            self.sett.screen.blit(self.sett.main_menu_2.render("SPACE để tiếp tục", False, (192, 192, 192)), (11.5 * 50, 12 * 50))
+                self.sett.screen.blit(self.sett.main_menu.render(row[2], False, ('silver')), (self.cre_list[row[0]].x, (row[1] - self.cre_run) * 50))
+            self.sett.screen.blit(self.sett.main_menu_2.render("SPACE để tiếp tục", False, ('silver')), (11.5 * 50, 12 * 50))
             self.cre_run += 0.02
-        elif(self.obj.menu == 5):
-            self.sett.screen.blit(self.sett.main_menu_2.render("SPACE để quay lại", False, (192, 192, 192)), (11.5 * 50, 12 * 50))
-            self.sett.screen.blit(self.sett.tutorial.render("Time: ", False, (192, 192, 192)), (16 * 50, 11.85 * 50))
-            self.sett.screen.blit(self.sett.tutorial.render(str(self.obj.event_time_now), False, (192, 192, 192)), (17.6 * 50, 11.85 * 50))
+        elif(self.obj.menu == 5): #minigame
+            self.sett.screen.blit(self.sett.main_menu_2.render("SPACE để quay lại", False, ('silver')), (11.5 * 50, 12 * 50))
+            self.sett.screen.blit(self.sett.tutorial.render("Time: ", False, ('silver')), (16 * 50, 11.85 * 50))
+            self.sett.screen.blit(self.sett.tutorial.render(str(self.obj.event_time_now), False, ('silver')), (17.6 * 50, 11.85 * 50))
             if(self.obj.event_lose):
-                self.sett.screen.blit(self.sett.minigame.render("Tết này bạn đã", False, (192, 192, 192)), (3 * 50, 4 * 50))
-                self.sett.screen.blit(self.sett.minigame.render(f"{self.sett.event_list[self.obj.event_lose_by]}", False, (192, 192, 192)), (3 * 50, 7 * 50))
+                self.sett.screen.blit(self.sett.minigame.render("Tết này bạn đã", False, ('silver')), (3 * 50, 4 * 50))
+                self.sett.screen.blit(self.sett.minigame.render(f"{self.sett.event_list[self.obj.event_lose_by]}", False, ('silver')), (3 * 50, 7 * 50))
             else:
                 self.event_player_rect.center = pygame.mouse.get_pos()
                 for pos in self.obj.event_pos:
@@ -441,7 +441,7 @@ class Board:
             color_1 = random.randint(0, 255)
             color_2 = random.randint(0, 255)
             color_3 = random.randint(0, 255)
-            new_spawn = self.sett.main_menu_2.render(f"{self.sett.event_list[event]}", False, (192, 192, 192)).get_rect(topleft = self.spawn)
+            new_spawn = self.sett.main_menu_2.render(f"{self.sett.event_list[event]}", False, ('silver')).get_rect(topleft = self.spawn)
             if(math.dist(new_spawn.center, self.event_player_rect.center) > 400):
                 self.obj.event_pos.append([new_spawn, event, color_1, color_2, color_3])
         if(self.obj.event_spawn > 1.2):
@@ -453,10 +453,10 @@ class Board:
         if(self.obj.moves <= 0):
             if(self.obj.secret):
                 self.sett.screen.blit(self.sett.secret, (0, 0))
-                self.sett.screen.blit(self.sett.tutorial.render("R để chơi lại", False, (192, 192, 192)), (11.5 * 50, 11 * 50))
+                self.sett.screen.blit(self.sett.tutorial.render("R để chơi lại", False, ('silver')), (11.5 * 50, 11 * 50))
             else:
                 self.sett.screen.blit(self.sett.loser, (0, 0))
-                self.sett.screen.blit(self.sett.tutorial.render("R để chơi lại", False, (192, 192, 192)), (11.5 * 50, 11 * 50))
+                self.sett.screen.blit(self.sett.tutorial.render("R để chơi lại", False, ('silver')), (11.5 * 50, 11 * 50))
         elif(self.obj.levelup):
             if(self.obj.level == 8):
                 for end in self.obj.ending:
@@ -464,28 +464,28 @@ class Board:
                         self.sett.screen.blit(pygame.transform.scale(pygame.image.load(f'assets/backgrounds/ending_{end}.png').convert_alpha(), (self.sett.width, self.sett.height)), (0, 0))
             else:
                 self.sett.screen.blit(self.sett.succ, (0, 0))
-            self.sett.screen.blit(self.sett.tutorial.render("SPACE để tiếp tục", False, (192, 192, 192)), (11.5 * 50, 11 * 50))
+            self.sett.screen.blit(self.sett.tutorial.render("SPACE để tiếp tục", False, ('silver')), (11.5 * 50, 11 * 50))
         elif(self.obj.final):
             self.sett.screen.blit(self.sett.background, (0, 0))
             self.sett.screen.blit(self.sett.cutscenes, (self.sett.cutscenes.get_rect(center = (650, 350)).x, 50))
             self.sett.screen.blit(self.sett.box, (0, 400))
-            self.sett.screen.blit(self.sett.main_menu.render(str(self.obj.fscript_0[self.obj.final_score]), False, (192, 192, 192)), (5 * 50, 8.5 * 50))
-            self.sett.screen.blit(self.sett.tutorial.render(str(self.obj.fscript_1[self.obj.final_score]), False, (192, 192, 192)), (7 * 50, 10 * 50 + 15))
-            self.sett.screen.blit(self.sett.tutorial.render(str(self.obj.fscript_2[self.obj.final_score]), False, (192, 192, 192)), (7 * 50, 11 * 50 + 15))
-            self.sett.screen.blit(self.sett.main_menu_2.render("SPACE để tiếp tục", False, (192, 192, 192)), (11.5 * 50, 13 * 50))
+            self.sett.screen.blit(self.sett.main_menu.render(str(self.obj.fscript_0[self.obj.final_score]), False, ('silver')), (5 * 50, 8.5 * 50))
+            self.sett.screen.blit(self.sett.tutorial.render(str(self.obj.fscript_1[self.obj.final_score]), False, ('silver')), (7 * 50, 10 * 50 + 15))
+            self.sett.screen.blit(self.sett.tutorial.render(str(self.obj.fscript_2[self.obj.final_score]), False, ('silver')), (7 * 50, 11 * 50 + 15))
+            self.sett.screen.blit(self.sett.main_menu_2.render("SPACE để tiếp tục", False, ('silver')), (11.5 * 50, 13 * 50))
             if(self.obj.vision[self.obj.final_score]):
                 self.sett.screen.blit(self.sett.player, (self.obj.player_pos[1] * 50, self.obj.player_pos[0] * 50))       
         else:
             self.sett.screen.blit(self.sett.background, (0, 0))
             self.sett.screen.blit(self.sett.hud, (0, 0))
             if(self.obj.moves > 9):
-                self.sett.screen.blit(self.sett.ingame.render(str(self.obj.moves), False, (192, 192, 192)), (1.3 * 50, 9.5 * 50))
+                self.sett.screen.blit(self.sett.ingame.render(str(self.obj.moves), False, ('silver')), (1.3 * 50, 9.5 * 50))
             else:
-                self.sett.screen.blit(self.sett.ingame.render(str(self.obj.moves), False, (192, 192, 192)), (2 * 50, 9.5 * 50))
+                self.sett.screen.blit(self.sett.ingame.render(str(self.obj.moves), False, ('silver')), (2 * 50, 9.5 * 50))
             if(self.obj.level < 10):
-                self.sett.screen.blit(self.sett.ingame.render(str(self.obj.level), False, (192, 192, 192)), (23 * 50, 9.5 * 50))
+                self.sett.screen.blit(self.sett.ingame.render(str(self.obj.level), False, ('silver')), (23 * 50, 9.5 * 50))
             else:
-                self.sett.screen.blit(self.sett.ingame.render(str(self.obj.level), False, (192, 192, 192)), (22.5 * 50, 9.5 * 50))
+                self.sett.screen.blit(self.sett.ingame.render(str(self.obj.level), False, ('silver')), (22.5 * 50, 9.5 * 50))
             for pos in self.obj.spike_pos:
                 self.sett.screen.blit(self.sett.spike, ((pos[1] + self.obj.col_count) * 50, (pos[0] + self.obj.row_count) * 50))
             if(self.obj.popup):
@@ -593,6 +593,8 @@ class Board:
                     self.sett.snd_lvlup.play()
                     self.obj.levelup = True
                 else:
+                    pygame.mixer.music.load('assets/soundtracks/normal.mp3')
+                    pygame.mixer.music.play(loops = -1, fade_ms = 3000)
                     self.sett.cutscenes = pygame.image.load(f'assets/cutscenes/cutscenes_0.png').convert_alpha()
                     self.sett.cutscenes = pygame.transform.scale(self.sett.cutscenes, (400, 400))
                     self.obj.final = True
@@ -883,6 +885,9 @@ class Board:
                             if self.obj.cheat == 4:
                                 self.obj.moves += 10
                             self.obj.cheat = 0
+                        elif event.key == pygame.K_z:
+                            self.obj.level += 1
+                            self.obj.__init__()
                         elif((event.key == pygame.K_SPACE) and self.obj.levelup):
                             if(self.obj.level < 8):
                                 if(self.obj.level_list[self.obj.level] == 0):
@@ -915,16 +920,16 @@ class Board:
                                 pygame.mixer.stop()
                                 if(self.obj.final_score == 8):
                                     pygame.mixer.music.load('assets/soundtracks/dead_end.mp3')
-                                    pygame.mixer.music.play(loops = -1, fade_ms = 3000)
+                                    pygame.mixer.music.play(loops = -1)
                                 elif(self.obj.final_score == 9):
                                     pygame.mixer.music.pause()
                                     self.sett.snd_nut.play()
                                 elif(self.obj.final_score == 13):
-                                    pygame.mixer.music.load('assets/soundtracks/good_end.mp3')
-                                    pygame.mixer.music.play(loops = -1, fade_ms = 3000)
+                                    pygame.mixer.music.load('assets/soundtracks/good_end2.mp3')
+                                    pygame.mixer.music.play(loops = -1)
                                 elif(self.obj.final_score == 19):
                                     pygame.mixer.music.load('assets/soundtracks/true_end.mp3')
-                                    pygame.mixer.music.play(loops = -1, fade_ms = 3000)
+                                    pygame.mixer.music.play(loops = -1)
                             else:
                                 self.obj.change = True
                                 if(self.obj.final_choose == 1):
@@ -933,10 +938,16 @@ class Board:
                                     self.obj.final_score += self.obj.fchoose_2[self.obj.final_score]
                                     self.obj.final_choose = 1
                                     self.obj.player_pos = [self.obj.player_pos[0] - 1, self.obj.player_pos[1]]
-                                if(self.obj.final_score == 18):
+                                if(self.obj.final_score in [7, 9, 10, 15, 17]):
+                                    pygame.mixer.music.stop()
+                                    pygame.mixer.music.unload()
+                                if(self.obj.final_score == 18 or self.obj.final_score == 8):
                                     self.sett.snd_demon.play()
                                 elif(self.obj.final_score == 19 or self.obj.final_score == 9):
                                     self.sett.snd_gun.play()
+                                elif(self.obj.final_score == 5):
+                                    pygame.mixer.music.load('assets/soundtracks/reveal.mp3')
+                                    pygame.mixer.music.play(loops = -1)
             if(self.obj.level == 0):
                 self._draw_main_menu()
             else:
